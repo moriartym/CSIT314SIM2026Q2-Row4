@@ -1,0 +1,7 @@
+Boundary → routes
+Control → controllers + services
+Entity → models + repositories
+
+when want to make a fail test, comment out the route for that sprint
+
+for running both npm run dev on both
