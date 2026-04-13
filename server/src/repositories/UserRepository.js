@@ -11,5 +11,16 @@ class UserRepository {
   }
 
 }
+  async updateById(id, data) {
+    return await User.f\updateById{
+      id,
+      data,
+      {
+        new: true,
+        runValidators: true
+      }
+    )
+  }
+}
 
 export default new UserRepository()
