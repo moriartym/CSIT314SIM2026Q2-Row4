@@ -18,6 +18,14 @@ class UserController {
       res.status(404).json({ success: false, message: error.message })
     }
   }
+  async updateUserById(req, res) {
+    try {
+      const user = await UserService.updateUserById(req.params.id)
+      res.status(200).json({ success: true, data: user })
+    } catch (error) {
+      res.status(404).json({ success: false, message: error.message })
+    }
+  }
 
 
 }
