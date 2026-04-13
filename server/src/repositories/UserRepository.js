@@ -12,7 +12,7 @@ class UserRepository {
 
 }
   async updateById(id, data) {
-    return await User.f\updateById{
+    return await User.updateById{
       id,
       data,
       {
