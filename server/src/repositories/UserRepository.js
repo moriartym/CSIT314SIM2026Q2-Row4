@@ -9,15 +9,17 @@ class UserRepository {
   async findById(id) {
     return await User.findById(id)
   }
-  async updateById(id, data) {
-    return await User.updateById(
-      id,
-      data,
-      {
-        new: true,
-        runValidators: true
-      }
-    )
+
+  async findByEmail(email) {
+    return await User.findOne({ email })
+  }
+
+  async findAll() {
+    return await User.find()
+  }
+
+  async update(id, data) {
+    return await User.findByIdAndUpdate(id, data, { returnDocument: 'after' })
   }
 }
 
