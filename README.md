@@ -1,34 +1,60 @@
-# CSIT314 - Coding Checklist
+# Online Fundraising System
 
-## Backend OOP
-- [ ] Classes defined for every entity (no plain functions doing logic)
-- [ ] Each class has clear responsibilities (no god classes)
-- [ ] Controller → Service → Repository → Model layers separated
+This is an online fundraising system developed using the MERN stack with Vite.
 
-## BCE Pattern
-- [ ] Boundary layer (routes/API endpoints)
-- [ ] Controller layer (handles request logic)
-- [ ] Entity layer (models/data classes)
+## Tech Stack
 
-## Test Driven Development
-- [ ] Write failing test first, then code
-- [ ] Unit tests for each feature/function
-- [ ] Screenshot test runs as evidence for report
-- [ ] Tests passing before merging to main
+- MongoDB
+- Express.js
+- React (Vite)
+- Node.js
 
-## CI/CD
-- [ ] GitHub Actions pipeline set up
-- [ ] Pipeline runs tests automatically on push
-- [ ] At least one feature shows full deploy pipeline
-- [ ] Screenshot pipeline runs for report
+(MERN + Vite)
 
-## Check with UML
-- [ ] Class names match the UML class diagram
-- [ ] Methods/attributes match what's designed
-- [ ] Sequence diagrams reflected in actual code flow
-- [ ] Sync with whoever does design if anything changes
+## Getting Started
 
-## Test Data
-- [ ] Script written to generate ~100 records per data type
-- [ ] Data covers all roles (User Admin, FR, Donee, Platform Management)
-- [ ] Data is realistic enough for live demo
+### 1. Setup Environment Variables
+
+Create a `.env` file inside the `server` folder.
+
+Refer to `.env.example` for required variables.
+
+You will need:
+- A working MongoDB connection string OR
+- Use the local MongoDB configuration provided
+
+### 2. Install Dependencies
+
+Client:
+cd client
+npm install
+
+Server:
+cd server
+npm install
+
+### 3. Run the Project
+
+Client:
+cd client
+npm run dev
+
+Server:
+cd server
+npm run dev
+
+## Run Tests
+
+cd server
+npm test
+
+## Notes
+
+- Ensure MongoDB is running before starting the server
+- Ensure `.env` is properly configured
+- Client runs using Vite development server
+- Server runs using Node.js + Express
+
+## Project Info
+
+This project is a full-stack web application built using MERN stack with Vite for frontend and Express/Node for backend.

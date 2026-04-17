@@ -7,7 +7,7 @@ class UserController {
       const user = await UserService.createUser(req.body)
       res.status(201).json({ success: true, message: 'User Account successfully created', data: user })
     } catch (error) {
-      if (error.message === 'Email already exists') {
+      if (error.message === 'Email already exists' || error.message === 'Username already exists') {
         return res.status(400).json({ success: false, message: error.message })
       }
       res.status(500).json({ success: false, message: error.message })
@@ -17,16 +17,9 @@ class UserController {
   async getAllUsers(req, res) {
     try {
       const users = await UserService.getAllUsers()
-
-      return res.status(200).json({
-        success: true,
-        data: users
-      })
+      return res.status(200).json({ success: true, data: users })
     } catch (error) {
-      return res.status(500).json({
-        success: false,
-        message: error.message
-      })
+      return res.status(500).json({ success: false, message: error.message })
     }
   }
 
@@ -41,12 +34,15 @@ class UserController {
       if (error.message === 'User not found') {
         return res.status(404).json({ success: false, message: 'User ID not found' })
       }
-      res.status(404).json({ success: false, message: error.message })
+      res.status(500).json({ success: false, message: error.message })
     }
   }
 
   async updateUser(req, res) {
     try {
+      if (!mongoose.Types.ObjectId.isValid(req.params.id)) {
+        return res.status(404).json({ success: false, message: 'User ID not found' })
+      }
       const user = await UserService.updateUser(req.params.id, req.body)
       res.status(200).json({ success: true, message: 'User Account successfully updated', data: user })
     } catch (error) {
@@ -54,6 +50,34 @@ class UserController {
         return res.status(404).json({ success: false, message: 'User account was not found' })
       }
       res.status(400).json({ success: false, message: error.message })
+    }
+  }
+
+  async suspendUser(req, res) {
+    try {
+      if (!mongoose.Types.ObjectId.isValid(req.params.id)) {
+        return res.status(404).json({ success: false, message: 'User ID not found' })
+      }
+      const user = await UserService.suspendUser(req.params.id)
+      res.status(200).json({ success: true, message: 'User Account successfully suspended', data: user })
+    } catch (error) {
+      if (error.message === 'User not found') {
+        return res.status(404).json({ success: false, message: 'User account was not found' })
+      }
+      res.status(500).json({ success: false, message: error.message })
+    }
+  }
+
+  async searchUsers(req, res) {
+    try {
+      const { query } = req.query
+      if (!query) {
+        return res.status(400).json({ success: false, message: 'Search query is required' })
+      }
+      const users = await UserService.searchUsers(query)
+      res.status(200).json({ success: true, data: users })
+    } catch (error) {
+      res.status(500).json({ success: false, message: error.message })
     }
   }
 }

@@ -1,120 +1,437 @@
-import { useState } from 'react'
+import { useState, useEffect } from 'react'
+import './styles/UserProfile.css'
 
-const API = 'http://localhost:3001/api/users'
+const API = 'http://localhost:3001/api/user-profiles'
+
+const PERMISSIONS = [
+  { value: 'user_management', label: 'User Management', desc: 'Can manage users and profiles' },
+  { value: 'fundraising', label: 'Fundraising', desc: 'Can create and manage FRA' },
+  { value: 'donating', label: 'Donating', desc: 'Can browse, save, and donate to FRA' },
+  { value: 'platform_management', label: 'Platform Management', desc: 'Can manage categories and generate reports' },
+]
+
+function PermissionCheckboxes({ selected, onChange }) {
+  const toggle = (val) => {
+    onChange(
+      selected.includes(val)
+        ? selected.filter(p => p !== val)
+        : [...selected, val]
+    )
+  }
+
+  return (
+    <div className="up-field">
+      <label className="up-label">
+        Permissions <span className="up-required">*</span>
+      </label>
+
+      <div style={{ display: 'flex', flexDirection: 'column', gap: '8px' }}>
+        {PERMISSIONS.map(p => (
+          <label
+            key={p.value}
+            style={{ display: 'flex', alignItems: 'center', gap: '10px', cursor: 'pointer' }}
+          >
+            <input
+              type="checkbox"
+              checked={selected.includes(p.value)}
+              onChange={() => toggle(p.value)}
+              style={{ accentColor: '#4fffb0', width: '14px', height: '14px' }}
+            />
+            <span style={{ fontSize: '13px', color: '#e8eaf0' }}>{p.label}</span>
+            <span style={{ fontSize: '11px', color: '#5a6a7a' }}>{p.desc}</span>
+          </label>
+        ))}
+      </div>
+    </div>
+  )
+}
 
 export default function UserProfile() {
-  const [form, setForm] = useState({ name: '', email: '', password: '', role: 'user_admin' })
-  const [userId, setUserId] = useState('')
-  const [user, setUser] = useState(null)
-  const [message, setMessage] = useState('')
+  const [tab, setTab] = useState('view')
 
-  const handleChange = (e) => {
-    setForm({ ...form, [e.target.name]: e.target.value })
-  }
+  return (
+    <div className="up-container">
+      <div className="up-header">
+        <h2 className="up-title">User Profiles</h2>
+        <p className="up-subtitle">Manage roles available on the platform</p>
+      </div>
 
-  const createUser = async () => {
+      <div className="up-tabs">
+        {['view', 'create', 'update'].map(t => (
+          <button
+            key={t}
+            className={`up-tab ${tab === t ? 'up-tab-active' : ''}`}
+            onClick={() => setTab(t)}
+          >
+            {t.charAt(0).toUpperCase() + t.slice(1)}
+          </button>
+        ))}
+      </div>
+
+      {tab === 'view' && <ViewProfiles />}
+      {tab === 'create' && <CreateProfile />}
+      {tab === 'update' && <UpdateProfile />}
+    </div>
+  )
+}
+
+function ViewProfiles() {
+  const [profiles, setProfiles] = useState([])
+  const [loading, setLoading] = useState(false)
+  const [error, setError] = useState(null)
+  const [expandedId, setExpandedId] = useState(null)
+  const [search, setSearch] = useState('')
+
+  const fetch_ = async () => {
+    setLoading(true)
+    setError(null)
+
     try {
-      const res = await fetch(API, {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify(form)
-      })
+      const res = await fetch(API, { credentials: 'include' })
       const data = await res.json()
-      if (data.success) {
-        setMessage(`User created! ID: ${data.data._id}`)
-        setUser(data.data)
-      } else {
-        setMessage(data.message)
-      }
-    } catch (err) {
-      setMessage('Error connecting to server')
+
+      if (data.success) setProfiles(data.data)
+      else setError(data.message)
+    } catch {
+      setError('Error connecting to server')
+    } finally {
+      setLoading(false)
     }
   }
 
-  const getUser = async () => {
+  useEffect(() => { fetch_() }, [])
+
+  const handleSearch = async (e) => {
+    const query = e.target.value
+    setSearch(query)
+
+    if (!query.trim()) {
+      fetch_()
+      return
+    }
+
     try {
-      const res = await fetch(`${API}/${userId}`)
+      const res = await fetch(
+        `${API}/search?query=${encodeURIComponent(query)}`,
+        { credentials: 'include' }
+      )
+
       const data = await res.json()
-      if (data.success) {
-        setUser(data.data)
-        setMessage('')
-      } else {
-        setMessage(data.message)
-      }
+
+      if (data.success) setProfiles(data.data)
+      else setProfiles([])
     } catch (err) {
-      setMessage('Error connecting to server')
+      console.error(err)
     }
   }
 
-  const updateUser = async () => {
+  const suspend = async (id) => {
     try {
-      const res = await fetch(`${API}/${userId}`, {
-        method: 'PUT',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify(form)
+      const res = await fetch(`${API}/${id}/suspend`, {
+        method: 'PATCH',
+        credentials: 'include',
       })
+
       const data = await res.json()
+
       if (data.success) {
-        setUser(data.data)
-        setMessage('User updated!')
-      } else {
-        setMessage(data.message)
+        search.trim()
+          ? handleSearch({ target: { value: search } })
+          : fetch_()
       }
     } catch (err) {
-      setMessage('Error connecting to server')
+      console.error(err)
     }
   }
 
   return (
-    <div style={styles.container}>
-      <h2 style={styles.title}>User Profile Management</h2>
-
-      <div style={styles.card}>
-        <h3 style={styles.subtitle}>Create / Update User</h3>
-        <input style={styles.input} name="name" placeholder="Name" value={form.name} onChange={handleChange} />
-        <input style={styles.input} name="email" placeholder="Email" value={form.email} onChange={handleChange} />
-        <input style={styles.input} name="password" placeholder="Password" type="password" value={form.password} onChange={handleChange} />
-        <select style={styles.input} name="role" value={form.role} onChange={handleChange}>
-          <option value="user_admin">User Admin</option>
-          <option value="fund_raiser">Fund Raiser</option>
-          <option value="donee">Donee</option>
-          <option value="platform_management">Platform Management</option>
-        </select>
-        <div style={styles.row}>
-          <button style={styles.btn} onClick={createUser}>Create User</button>
-          <button style={styles.btn} onClick={updateUser}>Update User</button>
-        </div>
+    <div className="up-card">
+      <div className="up-card-header">
+        <span className="up-card-title">All profiles</span>
+        <button className="up-btn up-btn-sm" onClick={fetch_}>Refresh</button>
       </div>
 
-      <div style={styles.card}>
-        <h3 style={styles.subtitle}>View User</h3>
-        <input style={styles.input} placeholder="Enter User ID" value={userId} onChange={(e) => setUserId(e.target.value)} />
-        <button style={styles.btn} onClick={getUser}>Get User</button>
+      <div className="up-field">
+        <input
+          className="up-input"
+          placeholder="Search profiles..."
+          value={search}
+          onChange={handleSearch}
+        />
       </div>
 
-      {message && <p style={styles.message}>{message}</p>}
+      {loading && <p className="up-muted">Loading…</p>}
+      {error && <div className="up-msg up-msg-error">{error}</div>}
+      {!loading && !error && profiles.length === 0 && (
+        <p className="up-muted">No profiles found</p>
+      )}
 
-      {user && (
-        <div style={styles.card}>
-          <h3 style={styles.subtitle}>User Details</h3>
-          <p><strong>ID:</strong> {user._id}</p>
-          <p><strong>Name:</strong> {user.name}</p>
-          <p><strong>Email:</strong> {user.email}</p>
-          <p><strong>Role:</strong> {user.role}</p>
-          <p><strong>Active:</strong> {user.isActive ? 'Yes' : 'No'}</p>
+      <div className="up-list">
+        {profiles.map(p => {
+          const isExpanded = expandedId === p._id
+
+          return (
+            <div key={p._id} className="up-row up-row-expandable">
+              <div
+                style={{ display: 'flex', alignItems: 'center', gap: '12px' }}
+                onClick={() => setExpandedId(isExpanded ? null : p._id)}
+              >
+                <div
+                  className="up-row-dot"
+                  style={{ background: p.isActive ? '#4fffb0' : '#e24b4a' }}
+                />
+
+                <div className="up-row-body">
+                  <p className="up-row-name">{p.profileName}</p>
+                </div>
+
+                <span style={{ marginLeft: 'auto', fontSize: '0.75rem', opacity: 0.5 }}>
+                  {isExpanded ? '▲' : '▼'}
+                </span>
+              </div>
+
+              {isExpanded && (
+                <div
+                  style={{
+                    padding: '0.75rem 1rem',
+                    borderTop: '1px solid rgba(255,255,255,0.08)',
+                    marginTop: '0.5rem',
+                  }}
+                >
+                  <p className="up-muted" style={{ fontSize: '0.72rem' }}>
+                    ID: {p._id}
+                  </p>
+
+                  <p className="up-row-name">{p.profileName}</p>
+                  {p.description && <p className="up-row-desc">{p.description}</p>}
+
+                  {p.permissions?.length > 0 && (
+                    <div style={{ display: 'flex', flexWrap: 'wrap', gap: '6px', marginTop: '8px' }}>
+                      {p.permissions.map(perm => (
+                        <span key={perm} className="up-perm-badge">
+                          {perm.replace(/_/g, ' ')}
+                        </span>
+                      ))}
+                    </div>
+                  )}
+
+                  <div className="up-row-actions" style={{ marginTop: '0.75rem' }}>
+                    <span className={`up-badge ${p.isActive ? 'up-badge-active' : 'up-badge-inactive'}`}>
+                      {p.isActive ? 'Active' : 'Suspended'}
+                    </span>
+
+                    <button
+                      className="up-btn-ghost"
+                      onClick={(e) => {
+                        e.stopPropagation()
+                        suspend(p._id)
+                      }}
+                    >
+                      {p.isActive ? 'Suspend' : 'Activate'}
+                    </button>
+                  </div>
+                </div>
+              )}
+            </div>
+          )
+        })}
+      </div>
+    </div>
+  )
+}
+
+function CreateProfile() {
+  const [form, setForm] = useState({ profileName: '', description: '', permissions: [] })
+  const [message, setMessage] = useState(null)
+
+  const handleChange = (e) => {
+    setForm(prev => ({ ...prev, [e.target.name]: e.target.value }))
+    setMessage(null)
+  }
+
+  const handleSubmit = async () => {
+    if (!form.profileName.trim()) {
+      setMessage({ type: 'error', text: 'Profile name is required' })
+      return
+    }
+
+    if (!form.permissions.length) {
+      setMessage({ type: 'error', text: 'At least one permission is required' })
+      return
+    }
+
+    try {
+      const res = await fetch(API, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        credentials: 'include',
+        body: JSON.stringify(form),
+      })
+
+      const data = await res.json()
+
+      if (data.success) {
+        setMessage({ type: 'success', text: `Profile "${data.data.profileName}" created!` })
+        setForm({ profileName: '', description: '', permissions: [] })
+      } else {
+        setMessage({ type: 'error', text: data.message })
+      }
+    } catch {
+      setMessage({ type: 'error', text: 'Error connecting to server' })
+    }
+  }
+
+  return (
+    <div className="up-card">
+      <p className="up-card-title">New profile</p>
+
+      <div className="up-field">
+        <label className="up-label">Profile name</label>
+        <input
+          className="up-input"
+          name="profileName"
+          value={form.profileName}
+          onChange={handleChange}
+        />
+      </div>
+
+      <div className="up-field">
+        <label className="up-label">Description <span className="up-optional">(optional)</span></label>
+        <textarea
+          className="up-input up-textarea"
+          name="description"
+          value={form.description}
+          onChange={handleChange}
+          rows={3}
+        />
+      </div>
+
+      <PermissionCheckboxes
+        selected={form.permissions}
+        onChange={perms => {
+          setForm(prev => ({ ...prev, permissions: perms }))
+          setMessage(null)
+        }}
+      />
+
+      <button className="up-btn" onClick={handleSubmit}>Create profile</button>
+
+      {message && (
+        <div className={`up-msg ${message.type === 'success' ? 'up-msg-success' : 'up-msg-error'}`}>
+          {message.text}
         </div>
       )}
     </div>
   )
 }
 
-const styles = {
-  container: { maxWidth: '600px', margin: '0 auto', padding: '2rem', fontFamily: 'sans-serif' },
-  title: { fontSize: '1.5rem', marginBottom: '1.5rem' },
-  subtitle: { fontSize: '1rem', marginBottom: '1rem' },
-  card: { border: '1px solid #ddd', borderRadius: '8px', padding: '1.5rem', marginBottom: '1rem' },
-  input: { width: '100%', padding: '8px', marginBottom: '10px', borderRadius: '4px', border: '1px solid #ccc', boxSizing: 'border-box' },
-  btn: { padding: '8px 16px', marginRight: '8px', borderRadius: '4px', border: 'none', background: '#4f46e5', color: 'white', cursor: 'pointer' },
-  row: { display: 'flex', gap: '8px' },
-  message: { color: '#e53e3e', marginTop: '1rem' }
+function UpdateProfile() {
+  const [profileId, setProfileId] = useState('')
+  const [form, setForm] = useState({ profileName: '', description: '', permissions: [] })
+  const [message, setMessage] = useState(null)
+
+  const handleSubmit = async () => {
+    if (!profileId.trim()) {
+      setMessage({ type: 'error', text: 'Profile ID is required' })
+      return
+    }
+
+    if (!form.permissions.length) {
+      setMessage({ type: 'error', text: 'At least one permission is required' })
+      return
+    }
+
+    const body = {}
+
+    if (form.profileName.trim()) body.profileName = form.profileName.trim()
+    if (form.description.trim()) body.description = form.description.trim()
+
+    body.permissions = form.permissions
+
+    if (!Object.keys(body).length) {
+      setMessage({ type: 'error', text: 'No fields to update' })
+      return
+    }
+
+    try {
+      const res = await fetch(`${API}/${profileId.trim()}`, {
+        method: 'PUT',
+        headers: { 'Content-Type': 'application/json' },
+        credentials: 'include',
+        body: JSON.stringify(body),
+      })
+
+      const data = await res.json()
+
+      if (data.success) setMessage({ type: 'success', text: 'Profile updated!' })
+      else setMessage({ type: 'error', text: data.message })
+    } catch {
+      setMessage({ type: 'error', text: 'Error connecting to server' })
+    }
+  }
+
+  return (
+    <div className="up-card">
+      <p className="up-card-title">Update profile</p>
+
+      <div className="up-field">
+        <label className="up-label">
+          Profile ID <span className="up-required">*</span>
+        </label>
+
+        <input
+          className="up-input"
+          value={profileId}
+          onChange={e => {
+            setProfileId(e.target.value)
+            setMessage(null)
+          }}
+        />
+      </div>
+
+      <div className="up-divider" />
+      <p className="up-hint">Leave fields blank to keep existing values</p>
+
+      <div className="up-field">
+        <label className="up-label">Profile name</label>
+        <input
+          className="up-input"
+          value={form.profileName}
+          onChange={e => {
+            setForm(p => ({ ...p, profileName: e.target.value }))
+            setMessage(null)
+          }}
+        />
+      </div>
+
+      <div className="up-field">
+        <label className="up-label">Description</label>
+        <textarea
+          className="up-input up-textarea"
+          rows={3}
+          value={form.description}
+          onChange={e => {
+            setForm(p => ({ ...p, description: e.target.value }))
+            setMessage(null)
+          }}
+        />
+      </div>
+
+      <PermissionCheckboxes
+        selected={form.permissions}
+        onChange={perms => {
+          setForm(prev => ({ ...prev, permissions: perms }))
+          setMessage(null)
+        }}
+      />
+
+      <button className="up-btn" onClick={handleSubmit}>Save changes</button>
+
+      {message && (
+        <div className={`up-msg ${message.type === 'success' ? 'up-msg-success' : 'up-msg-error'}`}>
+          {message.text}
+        </div>
+      )}
+    </div>
+  )
 }
