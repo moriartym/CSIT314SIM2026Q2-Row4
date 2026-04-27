@@ -3,28 +3,22 @@ import { useNavigate } from 'react-router-dom'
 import { useAuth } from '../context/AuthContext'
 import UserAccount from './UserAccount'
 import UserProfile from './UserProfile'
+import FundraisingActivity from './FundraisingActivity'
 import './styles/Dashboard.css'
+import AllCampaigns from './AllCampaigns'
 
 const NAV_ITEMS = [
-  { id: 'accounts', label: 'User Accounts', icon: '👤', permission: 'user_management' },
-  { id: 'profiles', label: 'User Profiles', icon: '🏷️', permission: 'user_management' },
+  { id: 'accounts',  label: 'User Accounts', icon: '👤', permission: 'user_management' },
+  { id: 'profiles',  label: 'User Profiles',  icon: '🏷️', permission: 'user_management' },
+  { id: 'campaigns', label: 'My Campaigns',   icon: '📢', permission: 'fundraising' },
+  { id: 'browse',    label: 'Browse',         icon: '🔍', permission: 'donating' },
 ]
 
 function NoPermission() {
   return (
-    <div style={{
-      display: 'flex',
-      flexDirection: 'column',
-      alignItems: 'center',
-      justifyContent: 'center',
-      height: '100%',
-      gap: '12px',
-      opacity: 0.6
-    }}>
+    <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', height: '100%', gap: '12px', opacity: 0.6 }}>
       <span style={{ fontSize: '2rem' }}>🔒</span>
-      <p style={{ fontSize: '1rem', color: '#e8eaf0' }}>
-        You don't have permission to view this page.
-      </p>
+      <p style={{ fontSize: '1rem', color: 'var(--dash-text-muted)' }}>You don't have permission to view this page.</p>
     </div>
   )
 }
@@ -32,10 +26,16 @@ function NoPermission() {
 export default function Dashboard() {
   const { user, logout } = useAuth()
   const navigate = useNavigate()
+  const [theme, setTheme] = useState('dark')
+
+  const toggleTheme = () => {
+    const next = theme === 'dark' ? 'light' : 'dark'
+    setTheme(next)
+    document.documentElement.setAttribute('data-theme', next)
+  }
 
   const isProfileActive = user?.userProfile?.isActive ?? true
   const userPermissions = user?.userProfile?.permissions || []
-
   const visibleNavItems = (user?.userProfile && !isProfileActive)
     ? []
     : NAV_ITEMS.filter(item => userPermissions.includes(item.permission))
@@ -49,7 +49,6 @@ export default function Dashboard() {
 
   const hasPermission = (id) => {
     if (user?.userProfile && !isProfileActive) return false
-
     const item = NAV_ITEMS.find(n => n.id === id)
     return item ? userPermissions.includes(item.permission) : false
   }
@@ -83,18 +82,17 @@ export default function Dashboard() {
               <p className="dash-role">{user?.userProfile?.profileName || 'Administrator'}</p>
             </div>
           </div>
-          <button className="dash-logout-btn" onClick={handleLogout}>
-            Sign out
+          <button className="dash-theme-btn" onClick={toggleTheme}>
+            {theme === 'dark' ? '☀ Light mode' : '☾ Dark mode'}
           </button>
+          <button className="dash-logout-btn" onClick={handleLogout}>Sign out</button>
         </div>
       </aside>
       <main className="dash-main">
-        {active === 'accounts' && (
-          hasPermission('accounts') ? <UserAccount /> : <NoPermission />
-        )}
-        {active === 'profiles' && (
-          hasPermission('profiles') ? <UserProfile /> : <NoPermission />
-        )}
+        {active === 'accounts'  && (hasPermission('accounts')  ? <UserAccount />         : <NoPermission />)}
+        {active === 'profiles'  && (hasPermission('profiles')  ? <UserProfile />         : <NoPermission />)}
+        {active === 'campaigns' && (hasPermission('campaigns') ? <FundraisingActivity /> : <NoPermission />)}
+        {active === 'browse' && (hasPermission('browse') ? <AllCampaigns /> : <NoPermission />)}
         {!active && <NoPermission />}
       </main>
     </div>

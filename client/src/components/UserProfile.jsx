@@ -24,7 +24,6 @@ function PermissionCheckboxes({ selected, onChange }) {
       <label className="up-label">
         Permissions <span className="up-required">*</span>
       </label>
-
       <div style={{ display: 'flex', flexDirection: 'column', gap: '8px' }}>
         {PERMISSIONS.map(p => (
           <label
@@ -35,10 +34,10 @@ function PermissionCheckboxes({ selected, onChange }) {
               type="checkbox"
               checked={selected.includes(p.value)}
               onChange={() => toggle(p.value)}
-              style={{ accentColor: '#4fffb0', width: '14px', height: '14px' }}
+              style={{ accentColor: 'var(--up-accent)', width: '14px', height: '14px' }}
             />
-            <span style={{ fontSize: '13px', color: '#e8eaf0' }}>{p.label}</span>
-            <span style={{ fontSize: '11px', color: '#5a6a7a' }}>{p.desc}</span>
+            <span style={{ fontSize: '13px', color: 'var(--up-text)' }}>{p.label}</span>
+            <span style={{ fontSize: '11px', color: 'var(--up-muted)' }}>{p.desc}</span>
           </label>
         ))}
       </div>

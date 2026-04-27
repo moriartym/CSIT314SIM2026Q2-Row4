@@ -6,6 +6,7 @@ import userRoutes from './src/routes/userRoutes.js'
 import userProfileRoutes from './src/routes/userProfileRoutes.js'
 import session from 'express-session'
 import authRoutes from './src/routes/authRoutes.js'
+import fundraisingActivityRoutes from './src/routes/fundraisingActivityRoutes.js'
 
 dotenv.config()
 
@@ -35,6 +36,7 @@ app.get('/', (req, res) => res.send('API running'))
 app.use('/api/users', userRoutes)
 app.use('/api/user-profiles', userProfileRoutes)
 app.use('/api/auth', authRoutes)
+app.use('/api/fra', fundraisingActivityRoutes)
 
 const PORT = process.env.PORT || 3001
 if (process.env.NODE_ENV !== 'test') {

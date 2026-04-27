@@ -1,36 +1,60 @@
 @import url('https://fonts.googleapis.com/css2?family=Syne:wght@400;600;700;800&family=DM+Sans:wght@300;400;500&display=swap');
 
+:root {
+  --ua-bg:       #111111;
+  --ua-bg-deep:  #0d0d0d;
+  --ua-border:   #1e1e1e;
+  --ua-border-2: #1a1a1a;
+  --ua-text:     #e8eaf0;
+  --ua-muted:    #5a6a7a;
+  --ua-hint:     #3a4a5a;
+  --ua-accent:   #4fffb0;
+  --ua-input-ph: #2a2a2a;
+  --ua-avatar-bg: #1e2a3a;
+}
+
+[data-theme="light"] {
+  --ua-bg:       #ffffff;
+  --ua-bg-deep:  #f4f5f7;
+  --ua-border:   #e2e4e8;
+  --ua-border-2: #ebebeb;
+  --ua-text:     #1a1a2e;
+  --ua-muted:    #6b7280;
+  --ua-hint:     #9ca3af;
+  --ua-accent:   #00a36c;
+  --ua-input-ph: #c4c9d4;
+  --ua-avatar-bg: #e8f5ef;
+}
+
 .ua-container {
   max-width: 720px;
   margin: 0 auto;
   padding: 40px 24px;
   font-family: 'DM Sans', sans-serif;
-  color: #e8eaf0;
+  color: var(--ua-text);
 }
 
-.ua-header {
-  margin-bottom: 28px;
-}
+.ua-header { margin-bottom: 28px; }
 
 .ua-title {
   font-family: 'Syne', sans-serif;
   font-size: 26px;
   font-weight: 700;
-  color: #fff;
+  color: var(--ua-text);
   margin: 0 0 4px;
 }
 
 .ua-subtitle {
   font-size: 14px;
-  color: #5a6a7a;
+  color: var(--ua-muted);
   margin: 0;
 }
 
 .ua-tabs {
   display: flex;
   gap: 4px;
-  background: #111;
-  border: 1px solid #1e1e1e;
+  background: var(--ua-bg);
+  border: 1px solid var(--ua-border);
   border-radius: 10px;
   padding: 4px;
   margin-bottom: 24px;
@@ -44,24 +68,22 @@
   font-family: 'DM Sans', sans-serif;
   font-size: 13px;
   font-weight: 500;
-  color: #5a6a7a;
+  color: var(--ua-muted);
   border-radius: 7px;
   cursor: pointer;
   transition: all 0.15s;
 }
 
-.ua-tab:hover {
-  color: #ccc;
-}
+.ua-tab:hover { color: var(--ua-text); }
 
 .ua-tab-active {
   background: #1e2a3a;
-  color: #4fffb0 !important;
+  color: var(--ua-accent) !important;
 }
 
 .ua-card {
-  background: #111;
-  border: 1px solid #1e1e1e;
+  background: var(--ua-bg);
+  border: 1px solid var(--ua-border);
   border-radius: 12px;
   padding: 24px;
   margin-bottom: 16px;
@@ -78,7 +100,7 @@
   font-family: 'Syne', sans-serif;
   font-size: 15px;
   font-weight: 600;
-  color: #fff;
+  color: var(--ua-text);
   margin: 0 0 20px;
 }
 
@@ -92,16 +114,14 @@
   display: flex;
   align-items: center;
   gap: 12px;
-  background: #0d0d0d;
-  border: 1px solid #1a1a1a;
+  background: var(--ua-bg-deep);
+  border: 1px solid var(--ua-border-2);
   border-radius: 8px;
   padding: 14px 16px;
   transition: border-color 0.15s;
 }
 
-.ua-row:hover {
-  border-color: #2a2a2a;
-}
+.ua-row:hover { border-color: var(--ua-border); }
 
 .ua-row-expandable {
   flex-direction: column;
@@ -111,30 +131,28 @@
 
 .ua-avatar {
   border-radius: 50%;
-  background: #1e2a3a;
+  background: var(--ua-avatar-bg);
   display: flex;
   align-items: center;
   justify-content: center;
   font-weight: 600;
-  color: #4fffb0;
+  color: var(--ua-accent);
   flex-shrink: 0;
   font-family: 'Syne', sans-serif;
 }
 
-.ua-row-body {
-  flex: 1;
-}
+.ua-row-body { flex: 1; }
 
 .ua-row-name {
   font-size: 14px;
   font-weight: 500;
-  color: #e8eaf0;
+  color: var(--ua-text);
   margin: 0 0 2px;
 }
 
 .ua-row-desc {
   font-size: 12px;
-  color: #5a6a7a;
+  color: var(--ua-muted);
   margin: 0;
 }
 
@@ -144,7 +162,7 @@
   padding: 3px 10px;
   border-radius: 20px;
   background: rgba(79, 255, 176, 0.08);
-  color: #4fffb0;
+  color: var(--ua-accent);
   letter-spacing: 0.04em;
   text-transform: capitalize;
   flex-shrink: 0;
@@ -166,7 +184,7 @@
 
 .ua-badge-active {
   background: rgba(79, 255, 176, 0.1);
-  color: #4fffb0;
+  color: var(--ua-accent);
 }
 
 .ua-badge-inactive {
@@ -174,26 +192,29 @@
   color: #e24b4a;
 }
 
+.ua-badge-completed {
+  background: rgba(100, 160, 255, 0.15);
+  color: #64a0ff;
+}
+
 .ua-btn-ghost {
   background: transparent;
-  border: 1px solid #2a2a2a;
+  border: 1px solid var(--ua-border);
   border-radius: 6px;
   padding: 4px 12px;
   font-family: 'DM Sans', sans-serif;
   font-size: 12px;
-  color: #7a8a9a;
+  color: var(--ua-muted);
   cursor: pointer;
   transition: all 0.15s;
 }
 
 .ua-btn-ghost:hover {
-  border-color: #444;
-  color: #ccc;
+  border-color: var(--ua-muted);
+  color: var(--ua-text);
 }
 
-.ua-field {
-  margin-bottom: 18px;
-}
+.ua-field { margin-bottom: 18px; }
 
 .ua-label {
   display: block;
@@ -201,39 +222,35 @@
   font-weight: 500;
   letter-spacing: 0.08em;
   text-transform: uppercase;
-  color: #5a6a7a;
+  color: var(--ua-muted);
   margin-bottom: 7px;
 }
 
 .ua-input {
   width: 100%;
-  background: #0d0d0d;
-  border: 1px solid #1e1e1e;
+  background: var(--ua-bg-deep);
+  border: 1px solid var(--ua-border);
   border-radius: 8px;
   padding: 11px 14px;
   font-family: 'DM Sans', sans-serif;
   font-size: 14px;
-  color: #e8eaf0;
+  color: var(--ua-text);
   outline: none;
   transition: border-color 0.2s, box-shadow 0.2s;
   box-sizing: border-box;
 }
 
-.ua-input::placeholder {
-  color: #2a2a2a;
-}
+.ua-input::placeholder { color: var(--ua-input-ph); }
 
 .ua-input:focus {
-  border-color: #4fffb0;
+  border-color: var(--ua-accent);
   box-shadow: 0 0 0 3px rgba(79, 255, 176, 0.06);
 }
 
-.ua-input-err {
-  border-color: #e24b4a !important;
-}
+.ua-input-err { border-color: #e24b4a !important; }
 
 .ua-btn {
-  background: #4fffb0;
+  background: var(--ua-accent);
   color: #0a0a0a;
   border: none;
   border-radius: 8px;
@@ -245,9 +262,7 @@
   transition: opacity 0.2s;
 }
 
-.ua-btn:hover {
-  opacity: 0.85;
-}
+.ua-btn:hover { opacity: 0.85; }
 
 .ua-btn-sm {
   padding: 7px 16px;
@@ -260,24 +275,22 @@
   margin-top: 3px;
 }
 
-.ua-required {
-  color: #e24b4a;
-}
+.ua-required { color: #e24b4a; }
 
 .ua-hint {
   font-size: 12px;
-  color: #3a4a5a;
+  color: var(--ua-hint);
   margin: 0 0 16px;
 }
 
 .ua-muted {
   font-size: 13px;
-  color: #3a4a5a;
+  color: var(--ua-muted);
 }
 
 .ua-divider {
   border: none;
-  border-top: 1px solid #1a1a1a;
+  border-top: 1px solid var(--ua-border-2);
   margin: 16px 0;
 }
 
@@ -290,7 +303,7 @@
 
 .ua-msg-success {
   background: rgba(79, 255, 176, 0.08);
-  color: #4fffb0;
+  color: var(--ua-accent);
   border: 1px solid rgba(79, 255, 176, 0.2);
 }
 
@@ -302,7 +315,7 @@
 
 .ua-optional {
   font-size: 10px;
-  color: #3a4a5a;
+  color: var(--ua-hint);
   text-transform: none;
   letter-spacing: 0;
 }
