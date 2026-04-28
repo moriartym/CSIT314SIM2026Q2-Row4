@@ -58,3 +58,19 @@ npm test
 ## Project Info
 
 This project is a full-stack web application built using MERN stack with Vite for frontend and Express/Node for backend.
+
+
+Boundary (interfaces with the outside world)
+
+routes
+controllers
+middleware
+
+Control (orchestrates logic / use cases)
+
+services
+
+Entity (data and domain objects)
+
+models
+repositories

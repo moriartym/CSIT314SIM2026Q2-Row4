@@ -15,11 +15,11 @@ class UserRepository {
   } 
 
   async findByEmail(email) {
-    return await User.findOne({ email })
+    return await User.findOne({ email }).populate('userProfile')
   }
 
   async findAll() {
-    return await User.find()
+    return await User.find().populate('userProfile')
   }
   
   async toggleSuspend(id) {

@@ -24,6 +24,10 @@
   --up-input-ph: #c4c9d4;
 }
 
+[data-theme="light"] .up-btn {
+  color: #ffffff;
+}
+
 .up-container {
   max-width: 720px;
   margin: 0 auto;
@@ -75,8 +79,8 @@
 .up-tab:hover { color: var(--up-text); }
 
 .up-tab-active {
-  background: #1e2a3a;
-  color: var(--up-accent) !important;
+  background: var(--dash-nav-active);
+  color: var(--dash-accent) !important;
 }
 
 .up-card {

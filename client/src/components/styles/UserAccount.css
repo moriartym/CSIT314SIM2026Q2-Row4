@@ -26,6 +26,10 @@
   --ua-avatar-bg: #e8f5ef;
 }
 
+[data-theme="light"] .ua-btn {
+  color: #ffffff;
+}
+
 .ua-container {
   max-width: 720px;
   margin: 0 auto;
@@ -77,8 +81,8 @@
 .ua-tab:hover { color: var(--ua-text); }
 
 .ua-tab-active {
-  background: #1e2a3a;
-  color: var(--ua-accent) !important;
+  background: var(--dash-nav-active);
+  color: var(--dash-accent) !important;
 }
 
 .ua-card {

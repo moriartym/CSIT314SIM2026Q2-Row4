@@ -186,7 +186,7 @@ function ViewTab() {
               </div>
 
               {isExpanded && (
-                <div style={{ padding: '0.75rem 1rem', borderTop: '1px solid rgba(255,255,255,0.08)', marginTop: '0.5rem' }}>
+                <div style={{ padding: '0.75rem 1rem', borderTop: '1px solid var(--ua-border)', marginTop: '0.5rem' }}>
                   <p className="ua-muted" style={{ fontSize: '0.72rem', marginBottom: '0.25rem' }}>ID: {u._id}</p>
                   <p className="ua-row-name">{u.username}</p>
                   <p className="ua-row-desc">{u.email}</p>
