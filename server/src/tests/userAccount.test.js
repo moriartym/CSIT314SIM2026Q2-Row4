@@ -3,7 +3,7 @@ import mongoose from 'mongoose'
 import bcrypt from 'bcrypt'
 import app from '../../index.js'
 import UserProfile from '../models/UserProfile.js'
-import User from '../models/User.js'
+import UserAccount from '../models/UserAccount.js'
 
 let userProfileId
 let agent
@@ -21,7 +21,7 @@ beforeAll(async () => {
   userProfileId = profile._id.toString()
 
   const hashedPassword = await bcrypt.hash('Abc.1234', 10)
-  await User.create({
+  await UserAccount.create({
     username: 'seedadmin',
     email: 'seedadmin@test.com',
     password: hashedPassword,
@@ -36,7 +36,7 @@ beforeAll(async () => {
 }, 30000)
 
 afterAll(async () => {
-  await mongoose.connection.collection('users').deleteMany({
+  await mongoose.connection.collection('useraccounts').deleteMany({
     email: { $in: ['test00@gmail.com', 'test01@gmail.com', 'seedadmin@test.com'] }
   })
   await mongoose.connection.collection('userprofiles').deleteMany({
@@ -51,7 +51,7 @@ describe('User Account API', () => {
   describe('TC-06: Create user account', () => {
     it('TC06-1: should create a user account successfully', async () => {
       const res = await agent
-        .post('/api/users')
+        .post('/api/users-account')
         .send({
           username: 'testuser00',
           email: 'test00@gmail.com',
@@ -71,7 +71,7 @@ describe('User Account API', () => {
 
     it('TC06-2: should not create a user account with duplicate email', async () => {
       const res = await agent
-        .post('/api/users')
+        .post('/api/users-account')
         .send({
           username: 'testuser01',
           email: 'test00@gmail.com',
@@ -87,7 +87,7 @@ describe('User Account API', () => {
 
   describe('TC-07: View user account', () => {
     it('TC07-1: should display user details for a valid ID', async () => {
-      const res = await agent.get(`/api/users/${userId}`)
+      const res = await agent.get(`/api/users-account/${userId}`)
 
       expect(res.status).toBe(200)
       expect(res.body.success).toBe(true)
@@ -95,7 +95,7 @@ describe('User Account API', () => {
     })
 
     it('TC07-2: should return not found for an invalid ID', async () => {
-      const res = await agent.get('/api/users/0000abdef12345')
+      const res = await agent.get('/api/users-account/0000abdef12345')
 
       expect(res.status).toBe(404)
       expect(res.body.success).toBe(false)
@@ -106,7 +106,7 @@ describe('User Account API', () => {
   describe('TC-08: Update user account', () => {
     it('TC08-1: should update a user account successfully', async () => {
       const res = await agent
-        .put(`/api/users/${userId}`)
+        .put(`/api/users-account/${userId}`)
         .send({
           username: 'testuser00updated',
           email: 'test00@gmail.com',
@@ -124,7 +124,7 @@ describe('User Account API', () => {
       const fakeId = new mongoose.Types.ObjectId().toString()
 
       const res = await agent
-        .put(`/api/users/${fakeId}`)
+        .put(`/api/users-account/${fakeId}`)
         .send({
           username: 'testuser00updated',
           email: 'notfound@gm.com',
@@ -139,7 +139,7 @@ describe('User Account API', () => {
 
   describe('TC-09: Suspend user account', () => {
     it('TC09-1: should suspend a user account successfully', async () => {
-      const res = await agent.patch(`/api/users/${userId}/suspend`)
+      const res = await agent.patch(`/api/users-account/${userId}/suspend`)
 
       expect(res.status).toBe(200)
       expect(res.body.success).toBe(true)
@@ -150,7 +150,7 @@ describe('User Account API', () => {
     it('TC09-2: should fail to suspend when user is not found', async () => {
       const fakeId = new mongoose.Types.ObjectId().toString()
 
-      const res = await agent.patch(`/api/users/${fakeId}/suspend`)
+      const res = await agent.patch(`/api/users-account/${fakeId}/suspend`)
 
       expect(res.status).toBe(404)
       expect(res.body.success).toBe(false)
@@ -160,19 +160,19 @@ describe('User Account API', () => {
 
   describe('TC-10: Search user accounts', () => {
     it('TC10-1: should return results for a valid search query', async () => {
-      const res = await agent.get('/api/users/search?query=testuser')
+      const res = await agent.get('/api/users-account/search?query=testuser')
 
       expect(res.status).toBe(200)
       expect(res.body.success).toBe(true)
       expect(Array.isArray(res.body.data)).toBe(true)
     })
 
-    it('TC10-2: should return 400 when search query is empty', async () => {
-      const res = await agent.get('/api/users/search?query=')
-
-      expect(res.status).toBe(400)
-      expect(res.body.success).toBe(false)
-      expect(res.body.message).toBe('Search query is required')
+    it('TC10-2: should return empty array for non-matching search query', async () => {
+      const res = await agent.get('/api/users-account/search?query=zzznomatchxxx')
+      expect(res.status).toBe(200)
+      expect(res.body.success).toBe(true)
+      expect(Array.isArray(res.body.data)).toBe(true)
+      expect(res.body.data.length).toBe(0)
     })
   })
 })

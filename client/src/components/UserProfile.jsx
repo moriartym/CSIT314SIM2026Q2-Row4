@@ -46,7 +46,7 @@ function PermissionCheckboxes({ selected, onChange }) {
 }
 
 export default function UserProfile() {
-  const [tab, setTab] = useState('view')
+  const [tab, setTab] = useState('search')
 
   return (
     <div className="up-container">
@@ -56,7 +56,7 @@ export default function UserProfile() {
       </div>
 
       <div className="up-tabs">
-        {['view', 'create', 'update'].map(t => (
+        {['search', 'create', 'update'].map(t => (
           <button
             key={t}
             className={`up-tab ${tab === t ? 'up-tab-active' : ''}`}
@@ -67,7 +67,7 @@ export default function UserProfile() {
         ))}
       </div>
 
-      {tab === 'view' && <ViewProfiles />}
+      {tab === 'search' && <ViewProfiles />}
       {tab === 'create' && <CreateProfile />}
       {tab === 'update' && <UpdateProfile />}
     </div>
@@ -84,11 +84,9 @@ function ViewProfiles() {
   const fetch_ = async () => {
     setLoading(true)
     setError(null)
-
     try {
-      const res = await fetch(API, { credentials: 'include' })
+      const res = await fetch(`${API}/search?query=`, { credentials: 'include' })
       const data = await res.json()
-
       if (data.success) setProfiles(data.data)
       else setError(data.message)
     } catch {

@@ -2,7 +2,7 @@ import request from 'supertest'
 import mongoose from 'mongoose'
 import app from '../../index.js'
 import UserProfile from '../models/UserProfile.js'
-import User from '../models/User.js'
+import UserAccount from '../models/UserAccount.js'
 import bcrypt from 'bcrypt'
 
 let userId
@@ -22,7 +22,7 @@ beforeAll(async () => {
   userProfileId = profile._id.toString()
 
   const hashedPassword = await bcrypt.hash('Abc.1234', 10)
-  const user = await User.create({
+  const user = await UserAccount.create({
     username: 'authuser',
     email: 'auth@test.com',
     password: hashedPassword,
@@ -38,7 +38,7 @@ beforeAll(async () => {
 }, 30000)
 
 afterAll(async () => {
-  await mongoose.connection.collection('users').deleteMany({ email: 'auth@test.com' })
+  await mongoose.connection.collection('useraccounts').deleteMany({ email: 'auth@test.com' })
   await mongoose.connection.collection('userprofiles').deleteMany({ profileName: 'Auth Test Profile' })
   await mongoose.connection.close()
 }, 30000)
@@ -82,7 +82,7 @@ describe('TC-11: User Login', () => {
   })
 
   it('TC11-4: should fail login if account is suspended', async () => {
-    await agent.patch(`/api/users/${userId}/suspend`)
+    await agent.patch(`/api/users-account/${userId}/suspend`)
 
     const res = await request(app)
       .post('/api/auth/login')
@@ -99,7 +99,7 @@ describe('TC-11: User Login', () => {
 describe('TC-12: User Logout', () => {
   beforeAll(async () => {
     await agent
-      .put(`/api/users/${userId}`)
+      .put(`/api/users-account/${userId}`)
       .send({
         username: 'authuser',
         email: 'auth@test.com',

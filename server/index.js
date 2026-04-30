@@ -2,7 +2,7 @@ import express from 'express'
 import mongoose from 'mongoose'
 import cors from 'cors'
 import dotenv from 'dotenv'
-import userRoutes from './src/routes/userRoutes.js'
+import userAccountRoutes from './src/routes/userAccountRoutes.js'
 import userProfileRoutes from './src/routes/userProfileRoutes.js'
 import session from 'express-session'
 import authRoutes from './src/routes/authRoutes.js'
@@ -33,7 +33,7 @@ mongoose.connect(process.env.MONGO_URI)
   .catch(err => console.error(err))
 
 app.get('/', (req, res) => res.send('API running'))
-app.use('/api/users', userRoutes)
+app.use('/api/users-account', userAccountRoutes)
 app.use('/api/user-profiles', userProfileRoutes)
 app.use('/api/auth', authRoutes)
 app.use('/api/fra', fundraisingActivityRoutes)

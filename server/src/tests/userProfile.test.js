@@ -3,7 +3,7 @@ import mongoose from 'mongoose'
 import bcrypt from 'bcrypt'
 import app from '../../index.js'
 import UserProfile from '../models/UserProfile.js'
-import User from '../models/User.js'
+import UserAccount from '../models/UserAccount.js'
 
 let agent
 
@@ -19,7 +19,7 @@ beforeAll(async () => {
   })
 
   const hashedPassword = await bcrypt.hash('Abc.1234', 10)
-  await User.create({
+  await UserAccount.create({
     username: 'profileadmin',
     email: 'profileadmin@test.com',
     password: hashedPassword,
@@ -34,7 +34,7 @@ beforeAll(async () => {
 }, 30000)
 
 afterAll(async () => {
-  await mongoose.connection.collection('users').deleteMany({
+  await mongoose.connection.collection('useraccounts').deleteMany({
     email: 'profileadmin@test.com'
   })
   await mongoose.connection.collection('userprofiles').deleteMany({

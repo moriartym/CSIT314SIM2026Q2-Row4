@@ -1,7 +1,7 @@
 import { useState, useEffect } from 'react'
 import './styles/UserAccount.css'
 
-const API      = 'http://localhost:3001/api/users'
+const API      = 'http://localhost:3001/api/users-account'
 const PROF_API = 'http://localhost:3001/api/user-profiles'
 
 const EMAIL_RE = /^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$/
@@ -65,7 +65,7 @@ function Avatar({ name, size = 34 }) {
 }
 
 export default function UserAccount() {
-  const [tab, setTab] = useState('view')
+  const [tab, setTab] = useState('search')
 
   return (
     <div className="ua-container">
@@ -75,7 +75,7 @@ export default function UserAccount() {
       </div>
 
       <div className="ua-tabs">
-        {['view', 'create', 'update'].map(t => (
+        {['search', 'create', 'update'].map(t => (
           <button
             key={t}
             className={`ua-tab ${tab === t ? 'ua-tab-active' : ''}`}
@@ -86,7 +86,7 @@ export default function UserAccount() {
         ))}
       </div>
 
-      {tab === 'view'   && <ViewTab />}
+      {tab === 'search'   && <ViewTab />}
       {tab === 'create' && <CreateTab />}
       {tab === 'update' && <UpdateTab />}
     </div>
@@ -104,7 +104,7 @@ function ViewTab() {
     setLoading(true)
     setError(null)
     try {
-      const res  = await fetch(API, { credentials: 'include' })
+      const res = await fetch(`${API}/search?query=`, { credentials: 'include' })
       const data = await res.json()
       if (data.success) setUsers(data.data)
       else setError(data.message)

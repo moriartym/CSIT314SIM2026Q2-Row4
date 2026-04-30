@@ -1,3 +1,4 @@
+import '../models/UserAccount.js'
 import FundraisingActivity from '../models/FundraisingActivity.js'
 
 class FundraisingActivityRepository {

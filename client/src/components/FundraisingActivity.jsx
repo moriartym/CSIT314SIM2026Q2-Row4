@@ -26,7 +26,7 @@ const blankForm = () => ({
 })
 
 export default function FundraisingActivity() {
-  const [tab, setTab] = useState('view')
+  const [tab, setTab] = useState('search')
   return (
     <div className="ua-container">
       <div className="ua-header">
@@ -34,7 +34,7 @@ export default function FundraisingActivity() {
         <p className="ua-subtitle">Create and manage your fundraising campaigns</p>
       </div>
       <div className="ua-tabs">
-        {['view', 'create', 'update', 'history'].map(t => (
+        {['search', 'create', 'update', 'history'].map(t => (
           <button
             key={t}
             className={`ua-tab ${tab === t ? 'ua-tab-active' : ''}`}
@@ -44,7 +44,7 @@ export default function FundraisingActivity() {
           </button>
         ))}
       </div>
-      {tab === 'view'    && <ViewTab />}
+      {tab === 'search'    && <ViewTab />}
       {tab === 'create'  && <CreateTab />}
       {tab === 'update'  && <UpdateTab />}
       {tab === 'history' && <HistoryTab />}

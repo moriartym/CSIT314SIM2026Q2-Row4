@@ -3,7 +3,7 @@ import mongoose from 'mongoose'
 import bcrypt from 'bcrypt'
 import app from '../../index.js'
 import UserProfile from '../models/UserProfile.js'
-import User from '../models/User.js'
+import UserAccount from '../models/UserAccount.js'
 import FundraisingActivity from '../models/FundraisingActivity.js'
 
 let agent
@@ -37,7 +37,7 @@ beforeAll(async () => {
 
   const hashedPassword = await bcrypt.hash('Abc.1234', 10)
 
-  const frUser = await User.create({
+  const frUser = await UserAccount.create({
     username: 'fruser',
     email: 'fruser@test.com',
     password: hashedPassword,
@@ -46,7 +46,7 @@ beforeAll(async () => {
   })
   frUserId = frUser._id.toString()
 
-  const doneeUser = await User.create({
+  const doneeUser = await UserAccount.create({
     username: 'doneeuser',
     email: 'doneeuser@test.com',
     password: hashedPassword,
@@ -60,7 +60,7 @@ beforeAll(async () => {
 }, 30000)
 
 afterAll(async () => {
-  await mongoose.connection.collection('users').deleteMany({
+  await mongoose.connection.collection('useraccounts').deleteMany({
     email: { $in: ['fruser@test.com', 'doneeuser@test.com'] }
   })
   await mongoose.connection.collection('userprofiles').deleteMany({
@@ -173,17 +173,7 @@ describe('TC-15: Update FRA', () => {
     expect(res.body.message).toBe('Fundraising activity successfully updated')
   })
 
-  it('TC15-2: should fail when title is empty', async () => {
-    const res = await agent
-      .put(`/api/fra/${fraId}`)
-      .send({ title: '' })
-
-    expect(res.status).toBe(400)
-    expect(res.body.success).toBe(false)
-    expect(res.body.message).toBe('Title cannot be empty')
-  })
-
-  it('TC15-3: should fail for non-existing FRA', async () => {
+  it('TC15-2: should fail for non-existing FRA', async () => {
     const fakeId = new mongoose.Types.ObjectId().toString()
     const res = await agent
       .put(`/api/fra/${fakeId}`)

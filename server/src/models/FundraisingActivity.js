@@ -6,7 +6,7 @@ const fundraisingActivitySchema = new mongoose.Schema({
   targetAmount:   { type: Number, required: true },
   category:       { type: String, trim: true },
   status:         { type: String, enum: ['active', 'suspended', 'completed'], default: 'active' },
-  createdBy:      { type: mongoose.Schema.Types.ObjectId, ref: 'User', required: true },
+  createdBy:      { type: mongoose.Schema.Types.ObjectId, ref: 'UserAccount', required: true },
   viewCount:      { type: Number, default: 0 },
   shortlistCount: { type: Number, default: 0 },
   completedAt:    { type: Date },
