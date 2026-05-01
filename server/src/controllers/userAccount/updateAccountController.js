@@ -7,8 +7,8 @@ class UpdateAccountController {
       if (!mongoose.Types.ObjectId.isValid(req.params.id)) {
         return res.status(404).json({ success: false, message: 'User ID not found' })
       }
-      const user = await UpdateAccountService.updateAccount(req.params.id, req.body)
-      res.status(200).json({ success: true, message: 'User Account successfully updated', data: user })
+      const userAccount = await UpdateAccountService.updateAccount(req.params.id, req.body)
+      res.status(200).json({ success: true, message: 'User Account successfully updated', data: userAccount })
     } catch (error) {
       if (error.message === 'User not found') {
         return res.status(404).json({ success: false, message: 'User account was not found' })
