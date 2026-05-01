@@ -168,15 +168,15 @@ export default function FundraisingActivity() {
           </button>
         ))}
       </div>
-      {tab === 'search'  && <ViewTab />}
-      {tab === 'create'  && <CreateTab />}
-      {tab === 'update'  && <UpdateTab />}
-      {tab === 'history' && <HistoryTab />}
+      {tab === 'search'  && <ViewFRA />}
+      {tab === 'create'  && <CreateFRA />}
+      {tab === 'update'  && <UpdateFRA />}
+      {tab === 'history' && <ViewCompletedFRA />}
     </div>
   )
 }
 
-function ViewTab() {
+function ViewFRA() {
   const [fras, setFras]           = useState([])
   const [loading, setLoading]     = useState(false)
   const [error, setError]         = useState(null)
@@ -281,7 +281,7 @@ function ViewTab() {
   )
 }
 
-function CreateTab() {
+function CreateFRA() {
   const [form, setForm]       = useState(blankForm())
   const [errors, setErrors]   = useState({})
   const [message, setMessage] = useState(null)
@@ -354,7 +354,7 @@ function CreateTab() {
   )
 }
 
-function UpdateTab() {
+function UpdateFRA() {
   const [fraId, setFraId]     = useState('')
   const [form, setForm]       = useState(blankForm())
   const [errors, setErrors]   = useState({})
@@ -432,7 +432,7 @@ function UpdateTab() {
   )
 }
 
-function HistoryTab() {
+function ViewCompletedFRA() {
   const [fras, setFras]           = useState([])
   const [loading, setLoading]     = useState(false)
   const [error, setError]         = useState(null)

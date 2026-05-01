@@ -7,8 +7,8 @@ class SuspendAccountController {
       if (!mongoose.Types.ObjectId.isValid(req.params.id)) {
         return res.status(404).json({ success: false, message: 'User ID not found' })
       }
-      const user = await SuspendAccountService.suspendAccount(req.params.id)
-      res.status(200).json({ success: true, message: 'User Account successfully suspended', data: user })
+      const userAccount = await SuspendAccountService.suspendAccount(req.params.id)
+      res.status(200).json({ success: true, message: 'User Account successfully suspended', data: userAccount })
     } catch (error) {
       if (error.message === 'User not found') {
         return res.status(404).json({ success: false, message: 'User account was not found' })

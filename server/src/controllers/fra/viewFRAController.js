@@ -6,7 +6,7 @@ class ViewFRAController {
     try {
       if (!mongoose.Types.ObjectId.isValid(req.params.id))
         return res.status(404).json({ success: false, message: 'Fundraising activity not found' })
-      const fra = await ViewFRAService.viewFRA(req.params.id, req.user._id.toString())
+      const fra = await ViewFRAService.viewFRA(req.params.id, req.userAccount._id.toString())
       res.status(200).json({ success: true, data: fra })
     } catch (error) {
       if (error.message === 'Unauthorized')

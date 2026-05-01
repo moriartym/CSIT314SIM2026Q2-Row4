@@ -33,7 +33,7 @@ function NoPermission() {
 }
 
 export default function Dashboard() {
-  const { user, logout } = useAuth()
+  const { userAccount, logout } = useAuth()
   const navigate = useNavigate()
   const [theme, setTheme] = useState('dark')
 
@@ -43,9 +43,9 @@ export default function Dashboard() {
     document.documentElement.setAttribute('data-theme', next)
   }
 
-  const isProfileActive = user?.userProfile?.isActive ?? true
-  const userPermissions = user?.userProfile?.permissions || []
-  const visibleNavItems = (user?.userProfile && !isProfileActive)
+  const isProfileActive = userAccount?.userProfile?.isActive ?? true
+  const userPermissions = userAccount?.userProfile?.permissions || []
+  const visibleNavItems = (userAccount?.userProfile && !isProfileActive)
     ? []
     : NAV_ITEMS.filter(item => userPermissions.includes(item.permission))
 
@@ -57,7 +57,7 @@ export default function Dashboard() {
   }
 
   const hasPermission = (id) => {
-    if (user?.userProfile && !isProfileActive) return false
+    if (userAccount?.userProfile && !isProfileActive) return false
     const item = NAV_ITEMS.find(n => n.id === id)
     return item ? userPermissions.includes(item.permission) : false
   }
@@ -84,11 +84,11 @@ export default function Dashboard() {
         <div className="dash-sidebar-footer">
           <div className="dash-user-info">
             <div className="dash-avatar">
-              {String(user?.username || 'U').slice(0, 2).toUpperCase()}
+              {String(userAccount?.username || 'U').slice(0, 2).toUpperCase()}
             </div>
             <div>
-              <p className="dash-username">{user?.username || 'Admin'}</p>
-              <p className="dash-role">{user?.userProfile?.profileName || 'Administrator'}</p>
+              <p className="dash-username">{userAccount?.username || 'Admin'}</p>
+              <p className="dash-role">{userAccount?.userProfile?.profileName || 'Administrator'}</p>
             </div>
           </div>
           <button className="dash-theme-btn" onClick={toggleTheme}>

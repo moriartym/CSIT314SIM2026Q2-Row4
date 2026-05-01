@@ -97,7 +97,7 @@ function ViewProfiles() {
 
   useEffect(() => { fetch_() }, [])
 
-  const handleSearch = async (e) => {
+  const searchProfile = async (e) => {
     const query = e.target.value
     setSearch(query)
     if (!query.trim()) { fetch_(); return }
@@ -111,11 +111,11 @@ function ViewProfiles() {
     }
   }
 
-  const suspend = async (id) => {
+  const suspendProfile = async (id) => {
     try {
       const res = await fetch(`${API}/${id}/suspend`, { method: 'PATCH', credentials: 'include' })
       const data = await res.json()
-      if (data.success) search.trim() ? handleSearch({ target: { value: search } }) : fetch_()
+      if (data.success) search.trim() ? searchProfile({ target: { value: search } }) : fetch_()
     } catch (err) {
       console.error(err)
     }
@@ -129,7 +129,7 @@ function ViewProfiles() {
       </div>
 
       <div className="ua-field">
-        <input className="ua-input" placeholder="Search profiles..." value={search} onChange={handleSearch} />
+        <input className="ua-input" placeholder="Search profiles..." value={search} onChange={searchProfile} />
       </div>
 
       {loading && <p className="ua-muted">Loading…</p>}
@@ -174,7 +174,7 @@ function ViewProfiles() {
                     <span className={`ua-badge ${p.isActive ? 'ua-badge-active' : 'ua-badge-inactive'}`}>
                       {p.isActive ? 'Active' : 'Suspended'}
                     </span>
-                    <button className="ua-btn-ghost" onClick={(e) => { e.stopPropagation(); suspend(p._id) }}>
+                    <button className="ua-btn-ghost" onClick={(e) => { e.stopPropagation(); suspendProfile(p._id) }}>
                       {p.isActive ? 'Suspend' : 'Activate'}
                     </button>
                   </div>

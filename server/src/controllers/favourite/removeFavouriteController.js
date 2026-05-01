@@ -3,7 +3,7 @@ import RemoveFavouriteService from '../../services/favourite/removeFavouriteServ
 class RemoveFavouriteController {
   async removeFavourite(req, res) {
     try {
-      await RemoveFavouriteService.removeFavourite(req.user._id.toString(), req.params.id)
+      await RemoveFavouriteService.removeFavourite(req.userAccount._id.toString(), req.params.id)
       res.status(200).json({ success: true, message: 'Removed from favourites' })
     } catch (error) {
       res.status(500).json({ success: false, message: error.message })

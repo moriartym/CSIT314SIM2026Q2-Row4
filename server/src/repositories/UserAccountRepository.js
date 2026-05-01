@@ -1,44 +1,44 @@
-import User from '../models/UserAccount.js'
+import UserAccount from '../models/UserAccount.js'
 
 class UserRepository {
   async create(data) {
-    const user = new User(data)
-    return await user.save()
+    const userAccount = new UserAccount(data)
+    return await userAccount.save()
   }
 
   async findById(id) {
-    return await User.findById(id).populate('userProfile')
+    return await UserAccount.findById(id).populate('userProfile')
   }
 
   async findByUsername(username) {
-    return await User.findOne({ username }).populate('userProfile')
+    return await UserAccount.findOne({ username }).populate('userProfile')
   } 
 
   async findByEmail(email) {
-    return await User.findOne({ email }).populate('userProfile')
+    return await UserAccount.findOne({ email }).populate('userProfile')
   }
 
   async findAll() {
-    return await User.find().populate('userProfile')
+    return await UserAccount.find().populate('userProfile')
   }
   
   async toggleSuspend(id) {
-    const user = await User.findById(id)
-    if (!user) return null
+    const userAccount = await UserAccount.findById(id)
+    if (!userAccount) return null
 
-    return await User.findByIdAndUpdate(
+    return await UserAccount.findByIdAndUpdate(
       id,
-      { isActive: !user.isActive },
+      { isActive: !userAccount.isActive },
       { new: true }
     )
   }
 
   async update(id, data) {
-    return await User.findByIdAndUpdate(id, data, { returnDocument: 'after' })
+    return await UserAccount.findByIdAndUpdate(id, data, { returnDocument: 'after' })
   }
 
   async search(query) {
-    return await User.find({
+    return await UserAccount.find({
       username: { $regex: query, $options: 'i' }
     })
   }

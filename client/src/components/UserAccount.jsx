@@ -85,15 +85,15 @@ export default function UserAccount() {
         ))}
       </div>
 
-      {tab === 'search'   && <ViewTab />}
-      {tab === 'create' && <CreateTab />}
-      {tab === 'update' && <UpdateTab />}
+      {tab === 'search'   && <ViewAccounts />}
+      {tab === 'create' && <CreateAccount />}
+      {tab === 'update' && <UpdateAccount />}
     </div>
   )
 }
 
-function ViewTab() {
-  const [users, setUsers]           = useState([])
+function ViewAccounts() {
+  const [userAccounts, setUserAccounts]           = useState([])
   const [loading, setLoading]       = useState(false)
   const [error, setError]           = useState(null)
   const [expandedId, setExpandedId] = useState(null)
@@ -105,7 +105,7 @@ function ViewTab() {
     try {
       const res = await fetch(`${API}/search?query=`, { credentials: 'include' })
       const data = await res.json()
-      if (data.success) setUsers(data.data)
+      if (data.success) setUserAccounts(data.data)
       else setError(data.message)
     } catch (err) {
       console.error('Failed to fetch users:', err)
@@ -124,14 +124,14 @@ function ViewTab() {
     try {
       const res  = await fetch(`${API}/search?query=${encodeURIComponent(query)}`, { credentials: 'include' })
       const data = await res.json()
-      if (data.success) setUsers(data.data)
-      else setUsers([])
+      if (data.success) setUserAccounts(data.data)
+      else setUserAccounts([])
     } catch (err) {
       console.error('Search failed:', err)
     }
   }
 
-  const suspend = async (id) => {
+  const suspendAccount = async (id) => {
     try {
       const res  = await fetch(`${API}/${id}/suspend`, { method: 'PATCH', credentials: 'include' })
       const data = await res.json()
@@ -162,10 +162,10 @@ function ViewTab() {
 
       {loading && <p className="ua-muted">Loading…</p>}
       {error   && <div className="ua-msg ua-msg-error">{error}</div>}
-      {!loading && !error && users.length === 0 && <p className="ua-muted">No users found</p>}
+      {!loading && !error && userAccounts.length === 0 && <p className="ua-muted">No users found</p>}
 
       <div className="ua-list">
-        {users.map(u => {
+        {userAccounts.map(u => {
           const isExpanded  = expandedId === u._id
           const profileName = u.userProfile?.profileName || '-'
 
@@ -200,7 +200,7 @@ function ViewTab() {
                     </span>
                     <button
                       className="ua-btn-ghost"
-                      onClick={(e) => { e.stopPropagation(); suspend(u._id) }}
+                      onClick={(e) => { e.stopPropagation(); suspendAccount(u._id) }}
                     >
                       {u.isActive ? 'Suspend' : 'Activate'}
                     </button>
@@ -215,7 +215,7 @@ function ViewTab() {
   )
 }
 
-function CreateTab() {
+function CreateAccount() {
   const { profiles, defaultProfileId } = useProfiles()
   const [form, setForm]                = useState(() => blankForm())
   const [errors, setErrors]            = useState({})
@@ -310,7 +310,7 @@ function CreateTab() {
   )
 }
 
-function UpdateTab() {
+function UpdateAccount() {
   const { profiles }            = useProfiles()
   const [userId, setUserId]     = useState('')
   const [form, setForm]         = useState(blankForm)

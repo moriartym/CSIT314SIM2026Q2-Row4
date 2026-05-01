@@ -25,14 +25,14 @@ beforeAll(async () => {
   userProfileId = profile._id.toString()
 
   const hashedPassword = await bcrypt.hash('Abc.1234', 10)
-  const user = await UserAccount.create({
+  const userAccount = await UserAccount.create({
     username: 'authuser',
     email: 'auth@test.com',
     password: hashedPassword,
     userProfile: userProfileId,
     isActive: true
   })
-  userId = user._id.toString()
+  userId = userAccount._id.toString()
 
   await agent
     .post('/api/auth/login')

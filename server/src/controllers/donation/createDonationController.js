@@ -8,7 +8,7 @@ class CreateDonationController {
         return res.status(400).json({ success: false, message: 'fraId and amount are required' })
 
       const donation = await CreateDonationService.createDonation(
-        req.user._id.toString(),
+        req.userAccount._id.toString(),
         { fraId, amount: Number(amount) }
       )
       res.status(201).json({ success: true, data: donation })
