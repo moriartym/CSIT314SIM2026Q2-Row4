@@ -55,7 +55,7 @@ class FundraisingActivityRepository {
     return await FundraisingActivity.findOneAndUpdate(
       { _id: id, viewedBy: { $nin: [userId] }, createdBy: { $ne: userId } },
       { $inc: { viewCount: 1 }, $addToSet: { viewedBy: userId } },
-      { new: true }
+      { returnDocument: 'after' }
     )
   }
 
@@ -86,42 +86,23 @@ class FundraisingActivityRepository {
   async findAllByUser(userId) {
     const fras = await FundraisingActivity
       .find({ createdBy: userId })
-      .populate('category')
-    return this._attachProgress(fras)
-  }
-
-  async findAllActive() {
-    const fras = await FundraisingActivity
-      .find({ status: 'active' })
-      .populate('createdBy')
-      .populate('category')
+      .select('title status targetAmount category viewCount shortlistCount')
+      .populate('category', 'name')
     return this._attachProgress(fras)
   }
 
   async findCompletedByUser(userId, filters = {}) {
     const match = { createdBy: userId, status: 'completed' }
-
     if (filters.category && mongoose.Types.ObjectId.isValid(filters.category)) {
       match.category = new mongoose.Types.ObjectId(filters.category)
     }
     if (filters.from) match.completedAt = { ...match.completedAt, $gte: new Date(filters.from) }
     if (filters.to)   match.completedAt = { ...match.completedAt, $lte: new Date(filters.to) }
 
-    const fras = await FundraisingActivity.find(match).populate('category')
-    return this._attachProgress(fras)
-  }
-
-  async findAllCompleted(filters = {}) {
-    const match = { status: 'completed' }
-    if (filters.category && mongoose.Types.ObjectId.isValid(filters.category)) {
-      match.category = new mongoose.Types.ObjectId(filters.category)
-    }
-    if (filters.from) match.completedAt = { ...match.completedAt, $gte: new Date(filters.from) }
-    if (filters.to)   match.completedAt = { ...match.completedAt, $lte: new Date(filters.to) }
-
-    const fras = await FundraisingActivity.find(match)
-      .populate('createdBy')
-      .populate('category')
+    const fras = await FundraisingActivity
+      .find(match)
+      .select('title status targetAmount category viewCount shortlistCount completedAt')
+      .populate('category', 'name')
     return this._attachProgress(fras)
   }
 
@@ -129,17 +110,22 @@ class FundraisingActivityRepository {
     const fras = await FundraisingActivity.find({
       createdBy: userId,
       title: { $regex: query, $options: 'i' },
-    }).populate('category')
+    })
+      .select('title status targetAmount category viewCount shortlistCount')
+      .populate('category', 'name')
     return this._attachProgress(fras)
   }
 
-  async searchAll(query) {
-    const fras = await FundraisingActivity.find({
-      status: 'active',
-      title: { $regex: query, $options: 'i' },
-    })
-      .populate('createdBy')
-      .populate('category')
+  async searchAll(query, status = 'active') {
+    const match = { status }
+    if (query && query.trim()) {
+      match.title = { $regex: query, $options: 'i' }
+    }
+    const fras = await FundraisingActivity.find(match)
+      .select('title status targetAmount category viewCount shortlistCount completedAt')
+      .populate('createdBy', 'username')
+      .populate('category', 'name')
+    
     return this._attachProgress(fras)
   }
 

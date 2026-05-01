@@ -86,16 +86,7 @@ describe('TC-33: Create FRA Category', () => {
 })
 
 describe('TC-34: View FRA Categories', () => {
-  it('TC34-1: should return all categories', async () => {
-    const res = await agent.get('/api/fra-categories')
-
-    expect(res.status).toBe(200)
-    expect(res.body.success).toBe(true)
-    expect(Array.isArray(res.body.data)).toBe(true)
-    expect(res.body.data.length).toBeGreaterThan(0)
-  })
-
-  it('TC34-2: should return a single category by valid ID', async () => {
+  it('TC34-1: should return a single category by valid ID', async () => {
     const res = await agent.get(`/api/fra-categories/${categoryId}`)
 
     expect(res.status).toBe(200)
@@ -103,7 +94,7 @@ describe('TC-34: View FRA Categories', () => {
     expect(res.body.data._id).toBe(categoryId)
   })
 
-  it('TC34-3: should return 404 for invalid ID', async () => {
+  it('TC34-2: should return 404 for invalid ID', async () => {
     const res = await agent.get('/api/fra-categories/invalidid123')
 
     expect(res.status).toBe(404)

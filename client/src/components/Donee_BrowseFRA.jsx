@@ -110,34 +110,23 @@ function DonateModal({ fra, onClose, onSuccess }) {
 }
 
 export default function BrowseCampaigns() {
-  const [tab, setTab]               = useState('active')
-  const [fras, setFras]             = useState([])
-  const [loading, setLoading]       = useState(false)
-  const [error, setError]           = useState(null)
-  const [expandedId, setExpanded]   = useState(null)
-  const [search, setSearch]         = useState('')
-  const [savedIds, setSavedIds]     = useState(new Set())
-  const [favLoading, setFavLoading] = useState(new Set())
-  const [donateTarget, setDonateTarget] = useState(null)
+  const [tab, setTab]                         = useState('active')
+  const [fras, setFras]                       = useState([])
+  const [loading, setLoading]                 = useState(false)
+  const [error, setError]                     = useState(null)
+  const [expandedId, setExpanded]             = useState(null)
+  const [expandedData, setExpandedData]       = useState(null)
+  const [expandedLoading, setExpandedLoading] = useState(false)
+  const [search, setSearch]                   = useState('')
+  const [savedIds, setSavedIds]               = useState(new Set())
+  const [favLoading, setFavLoading]           = useState(new Set())
+  const [donateTarget, setDonateTarget]       = useState(null)
 
-  const fetchActive = async () => {
+  const fetchFRAs = async (status, query = '') => {
     setLoading(true); setError(null)
     try {
-      const res  = await fetch(`${API}/all`, { credentials: 'include' })
-      const data = await res.json()
-      if (data.success) setFras(data.data)
-      else setError(data.message)
-    } catch {
-      setError('Error connecting to server')
-    } finally {
-      setLoading(false)
-    }
-  }
-
-  const fetchCompleted = async () => {
-    setLoading(true); setError(null)
-    try {
-      const res  = await fetch(`${API}/all/completed`, { credentials: 'include' })
+      const params = new URLSearchParams({ query, status })
+      const res  = await fetch(`${API}/all/search?${params.toString()}`, { credentials: 'include' })
       const data = await res.json()
       if (data.success) setFras(data.data)
       else setError(data.message)
@@ -150,7 +139,7 @@ export default function BrowseCampaigns() {
 
   const fetchFavourites = async () => {
     try {
-      const res  = await fetch(FAV_API, { credentials: 'include' })
+      const res  = await fetch(`${FAV_API}/search?query=`, { credentials: 'include' })
       const data = await res.json()
       if (data.success) {
         const ids = new Set(data.data.map(fav => fav.fra?._id?.toString() ?? fav.fra?.toString()))
@@ -162,7 +151,8 @@ export default function BrowseCampaigns() {
   useEffect(() => {
     setSearch('')
     setExpanded(null)
-    tab === 'active' ? fetchActive() : fetchCompleted()
+    setExpandedData(null)
+    fetchFRAs(tab)
   }, [tab])
 
   useEffect(() => { fetchFavourites() }, [])
@@ -170,31 +160,35 @@ export default function BrowseCampaigns() {
   const handleSearch = async (e) => {
     const query = e.target.value
     setSearch(query)
-    if (!query.trim()) {
-      tab === 'active' ? fetchActive() : fetchCompleted()
-      return
-    }
-    try {
-      const res  = await fetch(`${API}/all/search?query=${encodeURIComponent(query)}`, { credentials: 'include' })
-      const data = await res.json()
-      if (data.success) setFras(data.data)
-      else setFras([])
-    } catch { /* ignore */ }
+    setExpanded(null)
+    setExpandedData(null)
+    fetchFRAs(tab, query)
   }
 
-  const handleExpand = async (fra) => {
-    const opening = expandedId !== fra._id
-    setExpanded(opening ? fra._id : null)
-    if (opening) {
-      try {
-        const res  = await fetch(`${API}/${fra._id}/view`, { method: 'POST', credentials: 'include' })
-        const data = await res.json()
-        if (data.incremented) {
-          setFras(prev => prev.map(f =>
-            f._id === fra._id ? { ...f, viewCount: (f.viewCount ?? 0) + 1 } : f
-          ))
-        }
-      } catch { /* ignore */ }
+  const handleExpand = async (id) => {
+    if (expandedId === id) {
+      setExpanded(null)
+      setExpandedData(null)
+      return
+    }
+    setExpanded(id)
+    setExpandedData(null)
+    setExpandedLoading(true)
+    try {
+      const [viewRes, detailRes] = await Promise.all([
+        fetch(`${API}/${id}/view`, { method: 'POST', credentials: 'include' }),
+        fetch(`${API}/${id}`, { credentials: 'include' }),
+      ])
+      const viewData   = await viewRes.json()
+      const detailData = await detailRes.json()
+      if (detailData.success) setExpandedData(detailData.data)
+      if (viewData.incremented) {
+        setFras(prev => prev.map(f =>
+          f._id === id ? { ...f, viewCount: (f.viewCount ?? 0) + 1 } : f
+        ))
+      }
+    } catch { /* ignore */ } finally {
+      setExpandedLoading(false)
     }
   }
 
@@ -222,8 +216,7 @@ export default function BrowseCampaigns() {
             : f
         ))
       }
-    } catch { /* ignore */ }
-    finally {
+    } catch { /* ignore */ } finally {
       setFavLoading(prev => {
         const next = new Set(prev)
         next.delete(fraId)
@@ -234,6 +227,9 @@ export default function BrowseCampaigns() {
 
   const handleDonateSuccess = (fraId, amount) => {
     setDonateTarget(null)
+    if (expandedData && expandedData._id === fraId) {
+      setExpandedData(prev => ({ ...prev, totalRaised: (prev.totalRaised ?? 0) + amount }))
+    }
     setFras(prev => prev.map(f =>
       f._id === fraId ? { ...f, totalRaised: (f.totalRaised ?? 0) + amount } : f
     ))
@@ -261,7 +257,7 @@ export default function BrowseCampaigns() {
       <div className="ua-card">
         <div className="ua-card-header">
           <span className="ua-card-title">{tab === 'active' ? 'Active campaigns' : 'Completed campaigns'}</span>
-          <button className="ua-btn ua-btn-sm" onClick={() => tab === 'active' ? fetchActive() : fetchCompleted()}>Refresh</button>
+          <button className="ua-btn ua-btn-sm" onClick={() => fetchFRAs(tab, search)}>Refresh</button>
         </div>
 
         <div className="ua-field">
@@ -288,7 +284,7 @@ export default function BrowseCampaigns() {
               <div key={fra._id} className="ua-row ua-row-expandable">
                 <div
                   style={{ display: 'flex', alignItems: 'center', gap: '12px' }}
-                  onClick={() => handleExpand(fra)}
+                  onClick={() => handleExpand(fra._id)}
                 >
                   <div className="ua-avatar" style={{ width: 34, height: 34, fontSize: 12 }}>
                     {fra.title.slice(0, 2).toUpperCase()}
@@ -322,64 +318,69 @@ export default function BrowseCampaigns() {
 
                 {isExpanded && (
                   <div style={{ borderTop: '1px solid var(--ua-border-2)', marginTop: '12px', paddingTop: '14px' }}>
-                    <p className="ua-muted" style={{ fontSize: '0.72rem', marginBottom: '0.5rem' }}>ID: {fra._id}</p>
+                    {expandedLoading && <p className="ua-muted">Loading...</p>}
+                    {!expandedLoading && expandedData && (
+                      <>
+                        <p className="ua-muted" style={{ fontSize: '0.72rem', marginBottom: '0.5rem' }}>ID: {expandedData._id}</p>
 
-                    {fra.description && (
-                      <p className="ua-row-desc" style={{ marginBottom: '0.75rem' }}>{fra.description}</p>
-                    )}
+                        {expandedData.description && (
+                          <p className="ua-row-desc" style={{ marginBottom: '0.75rem' }}>{expandedData.description}</p>
+                        )}
 
-                    <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '8px', fontSize: '13px' }}>
-                      <div style={{ padding: '10px', background: 'var(--ua-bg)', borderRadius: '6px', border: '1px solid var(--ua-border)' }}>
-                        <p className="ua-muted" style={{ fontSize: '11px', marginBottom: '4px' }}>TARGET AMOUNT</p>
-                        <p style={{ color: 'var(--ua-accent)', fontWeight: 600 }}>${fra.targetAmount?.toLocaleString()}</p>
-                      </div>
-                      <div style={{ padding: '10px', background: 'var(--ua-bg)', borderRadius: '6px', border: '1px solid var(--ua-border)' }}>
-                        <p className="ua-muted" style={{ fontSize: '11px', marginBottom: '4px' }}>TOTAL RAISED</p>
-                        <p style={{ color: 'var(--ua-accent)', fontWeight: 600 }}>${(fra.totalRaised ?? 0).toLocaleString()}</p>
-                      </div>
-                      <div style={{ padding: '10px', background: 'var(--ua-bg)', borderRadius: '6px', border: '1px solid var(--ua-border)' }}>
-                        <p className="ua-muted" style={{ fontSize: '11px', marginBottom: '4px' }}>VIEWS</p>
-                        <p style={{ color: 'var(--ua-text)', fontWeight: 600 }}>👁 {fra.viewCount}</p>
-                      </div>
-                      <div style={{ padding: '10px', background: 'var(--ua-bg)', borderRadius: '6px', border: '1px solid var(--ua-border)' }}>
-                        <p className="ua-muted" style={{ fontSize: '11px', marginBottom: '4px' }}>SHORTLISTS</p>
-                        <p style={{ color: 'var(--ua-text)', fontWeight: 600 }}>🔖 {fra.shortlistCount}</p>
-                      </div>
-                      <div style={{ padding: '10px', background: 'var(--ua-bg)', borderRadius: '6px', border: '1px solid var(--ua-border)' }}>
-                        <p className="ua-muted" style={{ fontSize: '11px', marginBottom: '4px' }}>CREATED</p>
-                        <p style={{ color: 'var(--ua-text)', fontWeight: 600 }}>{new Date(fra.createdAt).toLocaleDateString()}</p>
-                      </div>
-                      {fra.completedAt && (
-                        <div style={{ padding: '10px', background: 'var(--ua-bg)', borderRadius: '6px', border: '1px solid var(--ua-border)' }}>
-                          <p className="ua-muted" style={{ fontSize: '11px', marginBottom: '4px' }}>COMPLETED</p>
-                          <p style={{ color: 'var(--ua-text)', fontWeight: 600 }}>{new Date(fra.completedAt).toLocaleDateString()}</p>
+                        <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '8px', fontSize: '13px' }}>
+                          <div style={{ padding: '10px', background: 'var(--ua-bg)', borderRadius: '6px', border: '1px solid var(--ua-border)' }}>
+                            <p className="ua-muted" style={{ fontSize: '11px', marginBottom: '4px' }}>TARGET AMOUNT</p>
+                            <p style={{ color: 'var(--ua-accent)', fontWeight: 600 }}>${expandedData.targetAmount?.toLocaleString()}</p>
+                          </div>
+                          <div style={{ padding: '10px', background: 'var(--ua-bg)', borderRadius: '6px', border: '1px solid var(--ua-border)' }}>
+                            <p className="ua-muted" style={{ fontSize: '11px', marginBottom: '4px' }}>TOTAL RAISED</p>
+                            <p style={{ color: 'var(--ua-accent)', fontWeight: 600 }}>${(expandedData.totalRaised ?? 0).toLocaleString()}</p>
+                          </div>
+                          <div style={{ padding: '10px', background: 'var(--ua-bg)', borderRadius: '6px', border: '1px solid var(--ua-border)' }}>
+                            <p className="ua-muted" style={{ fontSize: '11px', marginBottom: '4px' }}>VIEWS</p>
+                            <p style={{ color: 'var(--ua-text)', fontWeight: 600 }}>👁 {expandedData.viewCount}</p>
+                          </div>
+                          <div style={{ padding: '10px', background: 'var(--ua-bg)', borderRadius: '6px', border: '1px solid var(--ua-border)' }}>
+                            <p className="ua-muted" style={{ fontSize: '11px', marginBottom: '4px' }}>SHORTLISTS</p>
+                            <p style={{ color: 'var(--ua-text)', fontWeight: 600 }}>🔖 {expandedData.shortlistCount}</p>
+                          </div>
+                          <div style={{ padding: '10px', background: 'var(--ua-bg)', borderRadius: '6px', border: '1px solid var(--ua-border)' }}>
+                            <p className="ua-muted" style={{ fontSize: '11px', marginBottom: '4px' }}>CREATED</p>
+                            <p style={{ color: 'var(--ua-text)', fontWeight: 600 }}>{new Date(expandedData.createdAt).toLocaleDateString()}</p>
+                          </div>
+                          {expandedData.completedAt && (
+                            <div style={{ padding: '10px', background: 'var(--ua-bg)', borderRadius: '6px', border: '1px solid var(--ua-border)' }}>
+                              <p className="ua-muted" style={{ fontSize: '11px', marginBottom: '4px' }}>COMPLETED</p>
+                              <p style={{ color: 'var(--ua-text)', fontWeight: 600 }}>{new Date(expandedData.completedAt).toLocaleDateString()}</p>
+                            </div>
+                          )}
                         </div>
-                      )}
-                    </div>
 
-                    <ProgressBar totalRaised={fra.totalRaised ?? 0} targetAmount={fra.targetAmount ?? 0} />
+                        <ProgressBar totalRaised={expandedData.totalRaised ?? 0} targetAmount={expandedData.targetAmount ?? 0} />
 
-                    {fra.status === 'active' && (
-                      <div style={{ display: 'flex', alignItems: 'center', gap: '10px', marginTop: '0.75rem', flexWrap: 'wrap' }}>
-                        <button
-                          className="ua-btn ua-btn-sm"
-                          onClick={(e) => { e.stopPropagation(); setDonateTarget(fra) }}
-                        >
-                          💳 Donate
-                        </button>
-                        <button
-                          className="ua-btn-ghost"
-                          style={{
-                            color: isSaved ? '#e53e3e' : 'inherit',
-                            opacity: isFavLoading ? 0.5 : 1,
-                            cursor: isFavLoading ? 'not-allowed' : 'pointer',
-                          }}
-                          onClick={(e) => handleFavourite(e, fra._id)}
-                          disabled={isFavLoading}
-                        >
-                          {isFavLoading ? '…' : isSaved ? '♥ Saved' : '♡ Save'}
-                        </button>
-                      </div>
+                        {expandedData.status === 'active' && (
+                          <div style={{ display: 'flex', alignItems: 'center', gap: '10px', marginTop: '0.75rem', flexWrap: 'wrap' }}>
+                            <button
+                              className="ua-btn ua-btn-sm"
+                              onClick={(e) => { e.stopPropagation(); setDonateTarget(expandedData) }}
+                            >
+                              💳 Donate
+                            </button>
+                            <button
+                              className="ua-btn-ghost"
+                              style={{
+                                color: isSaved ? '#e53e3e' : 'inherit',
+                                opacity: isFavLoading ? 0.5 : 1,
+                                cursor: isFavLoading ? 'not-allowed' : 'pointer',
+                              }}
+                              onClick={(e) => handleFavourite(e, expandedData._id)}
+                              disabled={isFavLoading}
+                            >
+                              {isFavLoading ? '…' : isSaved ? '♥ Saved' : '♡ Save'}
+                            </button>
+                          </div>
+                        )}
+                      </>
                     )}
                   </div>
                 )}

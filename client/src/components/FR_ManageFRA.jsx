@@ -51,7 +51,6 @@ function ProgressBar({ totalRaised = 0, targetAmount = 0 }) {
 function FRADetailCard({ fra, categoryName, showActions, onSuspend, onComplete }) {
   return (
     <div style={{ borderTop: '1px solid var(--ua-border-2)', marginTop: '12px', paddingTop: '14px' }}>
-
       <p className="ua-muted" style={{ fontSize: '0.72rem', marginBottom: '0.5rem' }}>ID: {fra._id}</p>
 
       {fra.description && (
@@ -124,7 +123,7 @@ function useCategories() {
   useEffect(() => {
     const load = async () => {
       try {
-        const res  = await fetch(CAT_API, { credentials: 'include' })
+        const res  = await fetch(`${CAT_API}/search?query=`, { credentials: 'include' })
         const data = await res.json()
         if (data.success) {
           setCategories((data.data ?? []).filter(c => c.isActive === true))
@@ -177,11 +176,13 @@ export default function FundraisingActivity() {
 }
 
 function ViewFRA() {
-  const [fras, setFras]           = useState([])
-  const [loading, setLoading]     = useState(false)
-  const [error, setError]         = useState(null)
-  const [expandedId, setExpanded] = useState(null)
-  const [search, setSearch]       = useState('')
+  const [fras, setFras]                       = useState([])
+  const [loading, setLoading]                 = useState(false)
+  const [error, setError]                     = useState(null)
+  const [expandedId, setExpanded]             = useState(null)
+  const [expandedData, setExpandedData]       = useState(null)
+  const [expandedLoading, setExpandedLoading] = useState(false)
+  const [search, setSearch]                   = useState('')
 
   const fetchFRAs = async () => {
     setLoading(true); setError(null)
@@ -202,6 +203,8 @@ function ViewFRA() {
   const handleSearch = async (e) => {
     const query = e.target.value
     setSearch(query)
+    setExpanded(null)
+    setExpandedData(null)
     if (!query.trim()) { fetchFRAs(); return }
     try {
       const res  = await fetch(`${API}/search?query=${encodeURIComponent(query)}`, { credentials: 'include' })
@@ -211,11 +214,36 @@ function ViewFRA() {
     } catch { /* ignore */ }
   }
 
+  const handleExpand = async (id) => {
+    if (expandedId === id) {
+      setExpanded(null)
+      setExpandedData(null)
+      return
+    }
+    setExpanded(id)
+    setExpandedData(null)
+    setExpandedLoading(true)
+    try {
+      const res  = await fetch(`${API}/${id}`, { credentials: 'include' })
+      const data = await res.json()
+      if (data.success) setExpandedData(data.data)
+    } catch { /* ignore */ } finally {
+      setExpandedLoading(false)
+    }
+  }
+
   const suspend = async (id) => {
     try {
       const res  = await fetch(`${API}/${id}/suspend`, { method: 'PATCH', credentials: 'include' })
       const data = await res.json()
-      if (data.success) search.trim() ? handleSearch({ target: { value: search } }) : fetchFRAs()
+      if (data.success) {
+        if (expandedId === id) {
+          const res2  = await fetch(`${API}/${id}`, { credentials: 'include' })
+          const data2 = await res2.json()
+          if (data2.success) setExpandedData(data2.data)
+        }
+        search.trim() ? handleSearch({ target: { value: search } }) : fetchFRAs()
+      }
     } catch { /* ignore */ }
   }
 
@@ -223,7 +251,11 @@ function ViewFRA() {
     try {
       const res  = await fetch(`${API}/${id}/complete`, { method: 'PATCH', credentials: 'include' })
       const data = await res.json()
-      if (data.success) search.trim() ? handleSearch({ target: { value: search } }) : fetchFRAs()
+      if (data.success) {
+        setExpanded(null)
+        setExpandedData(null)
+        search.trim() ? handleSearch({ target: { value: search } }) : fetchFRAs()
+      }
     } catch { /* ignore */ }
   }
 
@@ -251,7 +283,7 @@ function ViewFRA() {
             <div key={fra._id} className="ua-row ua-row-expandable">
               <div
                 style={{ display: 'flex', alignItems: 'center', gap: '12px' }}
-                onClick={() => setExpanded(isExpanded ? null : fra._id)}
+                onClick={() => handleExpand(fra._id)}
               >
                 <div className="ua-avatar" style={{ width: 34, height: 34, fontSize: 12 }}>
                   {fra.title.slice(0, 2).toUpperCase()}
@@ -265,13 +297,18 @@ function ViewFRA() {
               </div>
 
               {isExpanded && (
-                <FRADetailCard
-                  fra={fra}
-                  categoryName={categoryName}
-                  showActions={true}
-                  onSuspend={suspend}
-                  onComplete={complete}
-                />
+                <div>
+                  {expandedLoading && <p className="ua-muted" style={{ padding: '12px 0' }}>Loading...</p>}
+                  {!expandedLoading && expandedData && (
+                    <FRADetailCard
+                      fra={expandedData}
+                      categoryName={expandedData.category?.name ?? '-'}
+                      showActions={true}
+                      onSuspend={suspend}
+                      onComplete={complete}
+                    />
+                  )}
+                </div>
               )}
             </div>
           )
@@ -433,12 +470,14 @@ function UpdateFRA() {
 }
 
 function ViewCompletedFRA() {
-  const [fras, setFras]           = useState([])
-  const [loading, setLoading]     = useState(false)
-  const [error, setError]         = useState(null)
-  const [expandedId, setExpanded] = useState(null)
-  const [filters, setFilters]     = useState({ category: '', from: '', to: '' })
-  const categories                = useCategories()
+  const [fras, setFras]                       = useState([])
+  const [loading, setLoading]                 = useState(false)
+  const [error, setError]                     = useState(null)
+  const [expandedId, setExpanded]             = useState(null)
+  const [expandedData, setExpandedData]       = useState(null)
+  const [expandedLoading, setExpandedLoading] = useState(false)
+  const [filters, setFilters]                 = useState({ category: '', from: '', to: '' })
+  const categories                            = useCategories()
 
   const fetchCompleted = async () => {
     setLoading(true); setError(null)
@@ -459,6 +498,24 @@ function ViewCompletedFRA() {
   }
 
   useEffect(() => { fetchCompleted() }, [])
+
+  const handleExpand = async (id) => {
+    if (expandedId === id) {
+      setExpanded(null)
+      setExpandedData(null)
+      return
+    }
+    setExpanded(id)
+    setExpandedData(null)
+    setExpandedLoading(true)
+    try {
+      const res  = await fetch(`${API}/${id}`, { credentials: 'include' })
+      const data = await res.json()
+      if (data.success) setExpandedData(data.data)
+    } catch { /* ignore */ } finally {
+      setExpandedLoading(false)
+    }
+  }
 
   const handleFilterChange = (e) => {
     setFilters(prev => ({ ...prev, [e.target.name]: e.target.value }))
@@ -484,7 +541,6 @@ function ViewCompletedFRA() {
             <option key={c._id} value={c._id}>{c.name}</option>
           ))}
         </select>
-
         <input className="ua-input" style={{ flex: 1, minWidth: '120px' }} name="from" type="date" value={filters.from} onChange={handleFilterChange} />
         <input className="ua-input" style={{ flex: 1, minWidth: '120px' }} name="to"   type="date" value={filters.to}   onChange={handleFilterChange} />
       </div>
@@ -502,7 +558,7 @@ function ViewCompletedFRA() {
             <div key={fra._id} className="ua-row ua-row-expandable">
               <div
                 style={{ display: 'flex', alignItems: 'center', gap: '12px' }}
-                onClick={() => setExpanded(isExpanded ? null : fra._id)}
+                onClick={() => handleExpand(fra._id)}
               >
                 <div className="ua-avatar" style={{ width: 34, height: 34, fontSize: 12 }}>
                   {fra.title.slice(0, 2).toUpperCase()}
@@ -516,11 +572,16 @@ function ViewCompletedFRA() {
               </div>
 
               {isExpanded && (
-                <FRADetailCard
-                  fra={fra}
-                  categoryName={categoryName}
-                  showActions={false}
-                />
+                <div>
+                  {expandedLoading && <p className="ua-muted" style={{ padding: '12px 0' }}>Loading...</p>}
+                  {!expandedLoading && expandedData && (
+                    <FRADetailCard
+                      fra={expandedData}
+                      categoryName={expandedData.category?.name ?? '-'}
+                      showActions={false}
+                    />
+                  )}
+                </div>
               )}
             </div>
           )

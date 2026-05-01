@@ -1,13 +1,12 @@
 import FundraisingActivityRepository from '../../repositories/FundraisingActivityRepository.js'
 
-class CompleteFRAService {
-  async completeFRA(id, userId) {
+class SuspendMyFRAService {
+  async suspendFRA(id, userId) {
     const fra = await FundraisingActivityRepository.findById(id)
     if (!fra) throw new Error('Fundraising activity not found')
     if (fra.createdBy._id.toString() !== userId) throw new Error('Unauthorized')
-    if (fra.status === 'completed') throw new Error('Campaign is already completed')
-    return await FundraisingActivityRepository.complete(id)
+    return await FundraisingActivityRepository.toggleSuspend(id)
   }
 }
 
-export default new CompleteFRAService()
+export default new SuspendMyFRAService()

@@ -11,12 +11,18 @@ import FRACategory from '../models/FRACategory.js'
 let doneeAgent
 let doneeUserId
 let doneeProfileId
+let frUserId
+let frProfileId
 let fraId
 let healthCategoryId
 
 beforeAll(async () => {
   await mongoose.connect(process.env.MONGO_URI)
   doneeAgent = request.agent(app)
+
+  await mongoose.connection.collection('useraccounts').deleteMany({ email: { $in: ['doneedonation@test.com', 'frdonation@test.com'] } })
+  await mongoose.connection.collection('userprofiles').deleteMany({ profileName: { $in: ['Donee Donation Test Profile', 'FR Donation Test Profile'] } })
+  await mongoose.connection.collection('fracategories').deleteMany({ name: 'Health' })
 
   const healthCategory = await FRACategory.create({ name: 'Health', isActive: true })
   healthCategoryId = healthCategory._id
@@ -29,6 +35,14 @@ beforeAll(async () => {
   })
   doneeProfileId = doneeProfile._id.toString()
 
+  const frProfile = await UserProfile.create({
+    profileName: 'FR Donation Test Profile',
+    description: 'For FR donation testing',
+    permissions: ['fundraising'],
+    isActive: true
+  })
+  frProfileId = frProfile._id.toString()
+
   const hashedPassword = await bcrypt.hash('Abc.1234', 10)
 
   const doneeUser = await UserAccount.create({
@@ -40,13 +54,22 @@ beforeAll(async () => {
   })
   doneeUserId = doneeUser._id.toString()
 
+  const frUser = await UserAccount.create({
+    username: 'frdonationuser',
+    email: 'frdonation@test.com',
+    password: hashedPassword,
+    userProfile: frProfileId,
+    isActive: true
+  })
+  frUserId = frUser._id.toString()
+
   const fra = await FundraisingActivity.create({
     title: 'Test FRA for Donations',
     description: 'FRA for donation testing',
     targetAmount: 10000,
     category: healthCategoryId,
     status: 'active',
-    createdBy: doneeUserId
+    createdBy: frUserId
   })
   fraId = fra._id.toString()
 
@@ -62,8 +85,8 @@ beforeAll(async () => {
 }, 30000)
 
 afterAll(async () => {
-  await mongoose.connection.collection('useraccounts').deleteMany({ email: 'doneedonation@test.com' })
-  await mongoose.connection.collection('userprofiles').deleteMany({ profileName: 'Donee Donation Test Profile' })
+  await mongoose.connection.collection('useraccounts').deleteMany({ email: { $in: ['doneedonation@test.com', 'frdonation@test.com'] } })
+  await mongoose.connection.collection('userprofiles').deleteMany({ profileName: { $in: ['Donee Donation Test Profile', 'FR Donation Test Profile'] } })
   await mongoose.connection.collection('fundraisingactivities').deleteMany({ title: 'Test FRA for Donations' })
   await mongoose.connection.collection('donations').deleteMany({ donee: new mongoose.Types.ObjectId(doneeUserId) })
   await mongoose.connection.collection('fracategories').deleteMany({ name: 'Health' })
@@ -73,7 +96,6 @@ afterAll(async () => {
 describe('TC-31: Search Donation History', () => {
   it('TC31-1: should return all donation history for the donee', async () => {
     const res = await doneeAgent.get('/api/fra/donations')
-
     expect(res.status).toBe(200)
     expect(res.body.success).toBe(true)
     expect(Array.isArray(res.body.data)).toBe(true)
@@ -82,7 +104,6 @@ describe('TC-31: Search Donation History', () => {
 
   it('TC31-2: should filter by category', async () => {
     const res = await doneeAgent.get(`/api/fra/donations?category=${healthCategoryId}`)
-
     expect(res.status).toBe(200)
     expect(res.body.success).toBe(true)
     expect(res.body.data.length).toBeGreaterThan(0)
@@ -90,7 +111,6 @@ describe('TC-31: Search Donation History', () => {
 
   it('TC31-3: should filter by date range', async () => {
     const res = await doneeAgent.get('/api/fra/donations?from=2024-01-01&to=2024-12-31')
-
     expect(res.status).toBe(200)
     expect(res.body.success).toBe(true)
     expect(res.body.data.length).toBeGreaterThan(0)
@@ -99,7 +119,6 @@ describe('TC-31: Search Donation History', () => {
   it('TC31-4: should return empty array for non-matching category', async () => {
     const fakeId = new mongoose.Types.ObjectId().toString()
     const res = await doneeAgent.get(`/api/fra/donations?category=${fakeId}`)
-
     expect(res.status).toBe(200)
     expect(res.body.success).toBe(true)
     expect(res.body.data.length).toBe(0)
@@ -107,7 +126,6 @@ describe('TC-31: Search Donation History', () => {
 
   it('TC31-5: should fail when not authenticated', async () => {
     const res = await request(app).get('/api/fra/donations')
-
     expect(res.status).toBe(401)
     expect(res.body.success).toBe(false)
   })
@@ -116,7 +134,6 @@ describe('TC-31: Search Donation History', () => {
 describe('TC-32: View FRA Progress', () => {
   it('TC32-1: should return FRA details and progress for valid ID', async () => {
     const res = await doneeAgent.get(`/api/fra/${fraId}`)
-
     expect(res.status).toBe(200)
     expect(res.body.success).toBe(true)
     expect(res.body.data._id).toBe(fraId)
@@ -125,7 +142,6 @@ describe('TC-32: View FRA Progress', () => {
 
   it('TC32-2: should return 404 for invalid ID format', async () => {
     const res = await doneeAgent.get('/api/fra/invalidid123')
-
     expect(res.status).toBe(404)
     expect(res.body.success).toBe(false)
     expect(res.body.message).toBe('Fundraising activity not found')
@@ -134,7 +150,6 @@ describe('TC-32: View FRA Progress', () => {
   it('TC32-3: should return 404 for non-existing FRA', async () => {
     const fakeId = new mongoose.Types.ObjectId().toString()
     const res = await doneeAgent.get(`/api/fra/${fakeId}`)
-
     expect(res.status).toBe(404)
     expect(res.body.success).toBe(false)
     expect(res.body.message).toBe('Fundraising activity not found')
@@ -142,7 +157,6 @@ describe('TC-32: View FRA Progress', () => {
 
   it('TC32-4: should fail when not authenticated', async () => {
     const res = await request(app).get(`/api/fra/${fraId}`)
-
     expect(res.status).toBe(401)
     expect(res.body.success).toBe(false)
   })

@@ -85,7 +85,7 @@ export default function UserAccount() {
         ))}
       </div>
 
-      {tab === 'search'   && <ViewAccounts />}
+      {tab === 'search' && <ViewAccounts />}
       {tab === 'create' && <CreateAccount />}
       {tab === 'update' && <UpdateAccount />}
     </div>
@@ -93,11 +93,13 @@ export default function UserAccount() {
 }
 
 function ViewAccounts() {
-  const [userAccounts, setUserAccounts]           = useState([])
-  const [loading, setLoading]       = useState(false)
-  const [error, setError]           = useState(null)
-  const [expandedId, setExpandedId] = useState(null)
-  const [search, setSearch]         = useState('')
+  const [userAccounts, setUserAccounts]     = useState([])
+  const [loading, setLoading]               = useState(false)
+  const [error, setError]                   = useState(null)
+  const [expandedId, setExpandedId]         = useState(null)
+  const [expandedData, setExpandedData]     = useState(null)
+  const [expandedLoading, setExpandedLoading] = useState(false)
+  const [search, setSearch]                 = useState('')
 
   const fetchUsers = async () => {
     setLoading(true)
@@ -120,6 +122,8 @@ function ViewAccounts() {
   const handleSearch = async (e) => {
     const query = e.target.value
     setSearch(query)
+    setExpandedId(null)
+    setExpandedData(null)
     if (!query.trim()) { fetchUsers(); return }
     try {
       const res  = await fetch(`${API}/search?query=${encodeURIComponent(query)}`, { credentials: 'include' })
@@ -131,11 +135,36 @@ function ViewAccounts() {
     }
   }
 
+  const handleExpand = async (id) => {
+    if (expandedId === id) {
+      setExpandedId(null)
+      setExpandedData(null)
+      return
+    }
+    setExpandedId(id)
+    setExpandedData(null)
+    setExpandedLoading(true)
+    try {
+      const res  = await fetch(`${API}/${id}`, { credentials: 'include' })
+      const data = await res.json()
+      if (data.success) setExpandedData(data.data)
+    } catch (err) {
+      console.error('View failed:', err)
+    } finally {
+      setExpandedLoading(false)
+    }
+  }
+
   const suspendAccount = async (id) => {
     try {
       const res  = await fetch(`${API}/${id}/suspend`, { method: 'PATCH', credentials: 'include' })
       const data = await res.json()
       if (data.success) {
+        if (expandedId === id) {
+          const res2  = await fetch(`${API}/${id}`, { credentials: 'include' })
+          const data2 = await res2.json()
+          if (data2.success) setExpandedData(data2.data)
+        }
         if (search.trim()) handleSearch({ target: { value: search } })
         else fetchUsers()
       }
@@ -173,7 +202,7 @@ function ViewAccounts() {
             <div key={u._id} className="ua-row ua-row-expandable">
               <div
                 style={{ display: 'flex', alignItems: 'center', gap: '12px' }}
-                onClick={() => setExpandedId(isExpanded ? null : u._id)}
+                onClick={() => handleExpand(u._id)}
               >
                 <Avatar name={u.username} />
                 <div className="ua-row-body">
@@ -186,25 +215,30 @@ function ViewAccounts() {
 
               {isExpanded && (
                 <div style={{ padding: '0.75rem 1rem', borderTop: '1px solid var(--ua-border)', marginTop: '0.5rem' }}>
-                  <p className="ua-muted" style={{ fontSize: '0.72rem', marginBottom: '0.25rem' }}>ID: {u._id}</p>
-                  <p className="ua-row-name">{u.username}</p>
-                  <p className="ua-row-desc">{u.email}</p>
-                  {u.phone       && <p className="ua-row-desc">Phone: {u.phone}</p>}
-                  {u.address     && <p className="ua-row-desc">Address: {u.address}</p>}
-                  {u.dateOfBirth && <p className="ua-row-desc">DOB: {new Date(u.dateOfBirth).toLocaleDateString()}</p>}
-                  <p className="ua-row-desc">Joined: {u.createdAt ? new Date(u.createdAt).toLocaleDateString() : '-'}</p>
+                  {expandedLoading && <p className="ua-muted">Loading...</p>}
+                  {!expandedLoading && expandedData && (
+                    <>
+                      <p className="ua-muted" style={{ fontSize: '0.72rem', marginBottom: '0.25rem' }}>ID: {expandedData._id}</p>
+                      <p className="ua-row-name">{expandedData.username}</p>
+                      <p className="ua-row-desc">{expandedData.email}</p>
+                      {expandedData.phone       && <p className="ua-row-desc">Phone: {expandedData.phone}</p>}
+                      {expandedData.address     && <p className="ua-row-desc">Address: {expandedData.address}</p>}
+                      {expandedData.dateOfBirth && <p className="ua-row-desc">DOB: {new Date(expandedData.dateOfBirth).toLocaleDateString()}</p>}
+                      <p className="ua-row-desc">Joined: {expandedData.createdAt ? new Date(expandedData.createdAt).toLocaleDateString() : '-'}</p>
 
-                  <div className="ua-row-actions" style={{ marginTop: '0.75rem' }}>
-                    <span className={`ua-badge ${u.isActive ? 'ua-badge-active' : 'ua-badge-inactive'}`}>
-                      {u.isActive ? 'Active' : 'Suspended'}
-                    </span>
-                    <button
-                      className="ua-btn-ghost"
-                      onClick={(e) => { e.stopPropagation(); suspendAccount(u._id) }}
-                    >
-                      {u.isActive ? 'Suspend' : 'Activate'}
-                    </button>
-                  </div>
+                      <div className="ua-row-actions" style={{ marginTop: '0.75rem' }}>
+                        <span className={`ua-badge ${expandedData.isActive ? 'ua-badge-active' : 'ua-badge-inactive'}`}>
+                          {expandedData.isActive ? 'Active' : 'Suspended'}
+                        </span>
+                        <button
+                          className="ua-btn-ghost"
+                          onClick={(e) => { e.stopPropagation(); suspendAccount(expandedData._id) }}
+                        >
+                          {expandedData.isActive ? 'Suspend' : 'Activate'}
+                        </button>
+                      </div>
+                    </>
+                  )}
                 </div>
               )}
             </div>
@@ -311,11 +345,11 @@ function CreateAccount() {
 }
 
 function UpdateAccount() {
-  const { profiles }            = useProfiles()
-  const [userId, setUserId]     = useState('')
-  const [form, setForm]         = useState(blankForm)
-  const [errors, setErrors]     = useState({})
-  const [message, setMessage]   = useState(null)
+  const { profiles }          = useProfiles()
+  const [userId, setUserId]   = useState('')
+  const [form, setForm]       = useState(blankForm)
+  const [errors, setErrors]   = useState({})
+  const [message, setMessage] = useState(null)
 
   const handleChange = (e) => {
     const { name, value } = e.target

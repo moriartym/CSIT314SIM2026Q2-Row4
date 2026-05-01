@@ -19,7 +19,7 @@ class UserRepository {
   }
 
   async findAll() {
-    return await UserAccount.find().populate('userProfile')
+      return await UserAccount.find().select('username email isActive userProfile').populate('userProfile')
   }
   
   async toggleSuspend(id) {
@@ -29,7 +29,7 @@ class UserRepository {
     return await UserAccount.findByIdAndUpdate(
       id,
       { isActive: !userAccount.isActive },
-      { new: true }
+      { returnDocument: 'after' }
     )
   }
 
@@ -38,9 +38,9 @@ class UserRepository {
   }
 
   async search(query) {
-    return await UserAccount.find({
-      username: { $regex: query, $options: 'i' }
-    })
+      return await UserAccount.find({
+          username: { $regex: query, $options: 'i' }
+      }).select('username email isActive userProfile').populate('userProfile')
   }
 }
 

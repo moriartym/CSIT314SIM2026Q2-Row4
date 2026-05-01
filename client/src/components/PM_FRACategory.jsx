@@ -49,11 +49,13 @@ export default function FRACategory() {
 }
 
 function SearchTab() {
-  const [categories, setCategories] = useState([])
-  const [loading, setLoading]       = useState(false)
-  const [error, setError]           = useState(null)
-  const [search, setSearch]         = useState('')
-  const [expandedId, setExpanded]   = useState(null)
+  const [categories, setCategories]           = useState([])
+  const [loading, setLoading]                 = useState(false)
+  const [error, setError]                     = useState(null)
+  const [search, setSearch]                   = useState('')
+  const [expandedId, setExpanded]             = useState(null)
+  const [expandedData, setExpandedData]       = useState(null)
+  const [expandedLoading, setExpandedLoading] = useState(false)
 
   const fetchAll = async () => {
     setLoading(true); setError(null)
@@ -74,6 +76,8 @@ function SearchTab() {
   const handleSearch = async (e) => {
     const query = e.target.value
     setSearch(query)
+    setExpanded(null)
+    setExpandedData(null)
     try {
       const res  = await fetch(`${API}/search?query=${encodeURIComponent(query)}`, { credentials: 'include' })
       const data = await res.json()
@@ -82,12 +86,37 @@ function SearchTab() {
     } catch { /* ignore */ }
   }
 
+  const handleExpand = async (id) => {
+    if (expandedId === id) {
+      setExpanded(null)
+      setExpandedData(null)
+      return
+    }
+    setExpanded(id)
+    setExpandedData(null)
+    setExpandedLoading(true)
+    try {
+      const res  = await fetch(`${API}/${id}`, { credentials: 'include' })
+      const data = await res.json()
+      if (data.success) setExpandedData(data.data)
+    } catch { /* ignore */ } finally {
+      setExpandedLoading(false)
+    }
+  }
+
   const suspend = async (id, e) => {
     e.stopPropagation()
     try {
       const res  = await fetch(`${API}/${id}/suspend`, { method: 'PATCH', credentials: 'include' })
       const data = await res.json()
-      if (data.success) fetchAll()
+      if (data.success) {
+        if (expandedId === id) {
+          const res2  = await fetch(`${API}/${id}`, { credentials: 'include' })
+          const data2 = await res2.json()
+          if (data2.success) setExpandedData(data2.data)
+        }
+        fetchAll()
+      }
     } catch { /* ignore */ }
   }
 
@@ -110,14 +139,13 @@ function SearchTab() {
         {categories.map(cat => {
           const isExpanded = expandedId === cat._id
           return (
-            <div key={cat._id} className="ua-row ua-row-expandable" onClick={() => setExpanded(isExpanded ? null : cat._id)}>
+            <div key={cat._id} className="ua-row ua-row-expandable" onClick={() => handleExpand(cat._id)}>
               <div style={{ display: 'flex', alignItems: 'center', gap: '12px' }}>
                 <div className="ua-avatar" style={{ width: 34, height: 34, fontSize: 12 }}>
                   {cat.name.slice(0, 2).toUpperCase()}
                 </div>
                 <div className="ua-row-body">
                   <p className="ua-row-name">{cat.name}</p>
-                  <p className="ua-row-desc">{cat.description || '-'}</p>
                 </div>
                 <StatusBadge isActive={cat.isActive} />
                 <span style={{ fontSize: '0.75rem', opacity: 0.5 }}>{isExpanded ? '▲' : '▼'}</span>
@@ -125,14 +153,20 @@ function SearchTab() {
 
               {isExpanded && (
                 <div style={{ padding: '0.75rem 1rem', borderTop: '1px solid var(--ua-border-2)', marginTop: '0.5rem' }}>
-                  <p className="ua-muted" style={{ fontSize: '0.72rem', marginBottom: '0.25rem' }}>ID: {cat._id}</p>
-                  <p className="ua-row-desc">Created: {new Date(cat.createdAt).toLocaleDateString()}</p>
-                  <div className="ua-row-actions" style={{ marginTop: '0.75rem' }}>
-                    <StatusBadge isActive={cat.isActive} />
-                    <button className="ua-btn-ghost" onClick={(e) => suspend(cat._id, e)}>
-                      {cat.isActive ? 'Suspend' : 'Activate'}
-                    </button>
-                  </div>
+                  {expandedLoading && <p className="ua-muted">Loading...</p>}
+                  {!expandedLoading && expandedData && (
+                    <>
+                      <p className="ua-muted" style={{ fontSize: '0.72rem', marginBottom: '0.25rem' }}>ID: {expandedData._id}</p>
+                      {expandedData.description && <p className="ua-row-desc">{expandedData.description}</p>}
+                      <p className="ua-row-desc">Created: {new Date(expandedData.createdAt).toLocaleDateString()}</p>
+                      <div className="ua-row-actions" style={{ marginTop: '0.75rem' }}>
+                        <StatusBadge isActive={expandedData.isActive} />
+                        <button className="ua-btn-ghost" onClick={(e) => suspend(expandedData._id, e)}>
+                          {expandedData.isActive ? 'Suspend' : 'Activate'}
+                        </button>
+                      </div>
+                    </>
+                  )}
                 </div>
               )}
             </div>

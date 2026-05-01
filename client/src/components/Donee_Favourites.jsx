@@ -50,17 +50,19 @@ export default function Favourites() {
 }
 
 function FavouriteListTab() {
-  const [favourites, setFavourites] = useState([])
-  const [loading, setLoading]       = useState(false)
-  const [error, setError]           = useState(null)
-  const [expandedId, setExpanded]   = useState(null)
-  const [search, setSearch]         = useState('')
-  const [favLoading, setFavLoading] = useState(new Set())
+  const [favourites, setFavourites]           = useState([])
+  const [loading, setLoading]                 = useState(false)
+  const [error, setError]                     = useState(null)
+  const [expandedId, setExpanded]             = useState(null)
+  const [expandedData, setExpandedData]       = useState(null)
+  const [expandedLoading, setExpandedLoading] = useState(false)
+  const [search, setSearch]                   = useState('')
+  const [favLoading, setFavLoading]           = useState(new Set())
 
   const fetchFavourites = async () => {
     setLoading(true); setError(null)
     try {
-      const res  = await fetch(FAV_API, { credentials: 'include' })
+      const res  = await fetch(`${FAV_API}/search?query=`, { credentials: 'include' })
       const data = await res.json()
       if (data.success) setFavourites(data.data.filter(fav => fav.fra?.status === 'active'))
       else setError(data.message)
@@ -76,6 +78,8 @@ function FavouriteListTab() {
   const handleSearch = async (e) => {
     const query = e.target.value
     setSearch(query)
+    setExpanded(null)
+    setExpandedData(null)
     if (!query.trim()) { fetchFavourites(); return }
     try {
       const res  = await fetch(`${FAV_API}/search?query=${encodeURIComponent(query)}`, { credentials: 'include' })
@@ -83,6 +87,24 @@ function FavouriteListTab() {
       if (data.success) setFavourites(data.data.filter(fav => fav.fra?.status === 'active'))
       else setFavourites([])
     } catch { /* ignore */ }
+  }
+
+  const handleExpand = async (favId) => {
+    if (expandedId === favId) {
+      setExpanded(null)
+      setExpandedData(null)
+      return
+    }
+    setExpanded(favId)
+    setExpandedData(null)
+    setExpandedLoading(true)
+    try {
+      const res  = await fetch(`${FAV_API}/${favId}`, { credentials: 'include' })
+      const data = await res.json()
+      if (data.success) setExpandedData(data.data)
+    } catch { /* ignore */ } finally {
+      setExpandedLoading(false)
+    }
   }
 
   const handleUnfavourite = async (e, fraId, favId) => {
@@ -95,9 +117,12 @@ function FavouriteListTab() {
       const data = await res.json()
       if (data.success) {
         setFavourites(prev => prev.filter(f => f._id !== favId))
+        if (expandedId === favId) {
+          setExpanded(null)
+          setExpandedData(null)
+        }
       }
-    } catch { /* ignore */ }
-    finally {
+    } catch { /* ignore */ } finally {
       setFavLoading(prev => {
         const next = new Set(prev)
         next.delete(favId)
@@ -133,7 +158,7 @@ function FavouriteListTab() {
             <div key={fav._id} className="ua-row ua-row-expandable">
               <div
                 style={{ display: 'flex', alignItems: 'center', gap: '12px' }}
-                onClick={() => setExpanded(isExpanded ? null : fav._id)}
+                onClick={() => handleExpand(fav._id)}
               >
                 <div className="ua-avatar" style={{ width: 34, height: 34, fontSize: 12 }}>
                   {fra.title.slice(0, 2).toUpperCase()}
@@ -165,51 +190,59 @@ function FavouriteListTab() {
 
               {isExpanded && (
                 <div style={{ borderTop: '1px solid var(--ua-border-2)', marginTop: '12px', paddingTop: '14px' }}>
-                  <p className="ua-muted" style={{ fontSize: '0.72rem', marginBottom: '0.5rem' }}>ID: {fra._id}</p>
+                  {expandedLoading && <p className="ua-muted">Loading...</p>}
+                  {!expandedLoading && expandedData && (() => {
+                    const exFra = expandedData.fra
+                    return (
+                      <>
+                        <p className="ua-muted" style={{ fontSize: '0.72rem', marginBottom: '0.5rem' }}>ID: {exFra._id}</p>
 
-                  {fra.description && (
-                    <p className="ua-row-desc" style={{ marginBottom: '0.75rem' }}>{fra.description}</p>
-                  )}
+                        {exFra.description && (
+                          <p className="ua-row-desc" style={{ marginBottom: '0.75rem' }}>{exFra.description}</p>
+                        )}
 
-                  <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '8px', fontSize: '13px' }}>
-                    <div style={{ padding: '10px', background: 'var(--ua-bg)', borderRadius: '6px', border: '1px solid var(--ua-border)' }}>
-                      <p className="ua-muted" style={{ fontSize: '11px', marginBottom: '4px' }}>TARGET AMOUNT</p>
-                      <p style={{ color: 'var(--ua-accent)', fontWeight: 600 }}>${fra.targetAmount?.toLocaleString()}</p>
-                    </div>
-                    <div style={{ padding: '10px', background: 'var(--ua-bg)', borderRadius: '6px', border: '1px solid var(--ua-border)' }}>
-                      <p className="ua-muted" style={{ fontSize: '11px', marginBottom: '4px' }}>TOTAL RAISED</p>
-                      <p style={{ color: 'var(--ua-accent)', fontWeight: 600 }}>${(fra.totalRaised ?? 0).toLocaleString()}</p>
-                    </div>
-                    <div style={{ padding: '10px', background: 'var(--ua-bg)', borderRadius: '6px', border: '1px solid var(--ua-border)' }}>
-                      <p className="ua-muted" style={{ fontSize: '11px', marginBottom: '4px' }}>VIEWS</p>
-                      <p style={{ color: 'var(--ua-text)', fontWeight: 600 }}>👁 {fra.viewCount}</p>
-                    </div>
-                    <div style={{ padding: '10px', background: 'var(--ua-bg)', borderRadius: '6px', border: '1px solid var(--ua-border)' }}>
-                      <p className="ua-muted" style={{ fontSize: '11px', marginBottom: '4px' }}>SHORTLISTS</p>
-                      <p style={{ color: 'var(--ua-text)', fontWeight: 600 }}>🔖 {fra.shortlistCount}</p>
-                    </div>
-                    <div style={{ padding: '10px', background: 'var(--ua-bg)', borderRadius: '6px', border: '1px solid var(--ua-border)' }}>
-                      <p className="ua-muted" style={{ fontSize: '11px', marginBottom: '4px' }}>SAVED ON</p>
-                      <p style={{ color: 'var(--ua-text)', fontWeight: 600 }}>{new Date(fav.createdAt).toLocaleDateString()}</p>
-                    </div>
-                  </div>
+                        <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '8px', fontSize: '13px' }}>
+                          <div style={{ padding: '10px', background: 'var(--ua-bg)', borderRadius: '6px', border: '1px solid var(--ua-border)' }}>
+                            <p className="ua-muted" style={{ fontSize: '11px', marginBottom: '4px' }}>TARGET AMOUNT</p>
+                            <p style={{ color: 'var(--ua-accent)', fontWeight: 600 }}>${exFra.targetAmount?.toLocaleString()}</p>
+                          </div>
+                          <div style={{ padding: '10px', background: 'var(--ua-bg)', borderRadius: '6px', border: '1px solid var(--ua-border)' }}>
+                            <p className="ua-muted" style={{ fontSize: '11px', marginBottom: '4px' }}>TOTAL RAISED</p>
+                            <p style={{ color: 'var(--ua-accent)', fontWeight: 600 }}>${(exFra.totalRaised ?? 0).toLocaleString()}</p>
+                          </div>
+                          <div style={{ padding: '10px', background: 'var(--ua-bg)', borderRadius: '6px', border: '1px solid var(--ua-border)' }}>
+                            <p className="ua-muted" style={{ fontSize: '11px', marginBottom: '4px' }}>VIEWS</p>
+                            <p style={{ color: 'var(--ua-text)', fontWeight: 600 }}>👁 {exFra.viewCount}</p>
+                          </div>
+                          <div style={{ padding: '10px', background: 'var(--ua-bg)', borderRadius: '6px', border: '1px solid var(--ua-border)' }}>
+                            <p className="ua-muted" style={{ fontSize: '11px', marginBottom: '4px' }}>SHORTLISTS</p>
+                            <p style={{ color: 'var(--ua-text)', fontWeight: 600 }}>🔖 {exFra.shortlistCount}</p>
+                          </div>
+                          <div style={{ padding: '10px', background: 'var(--ua-bg)', borderRadius: '6px', border: '1px solid var(--ua-border)' }}>
+                            <p className="ua-muted" style={{ fontSize: '11px', marginBottom: '4px' }}>SAVED ON</p>
+                            <p style={{ color: 'var(--ua-text)', fontWeight: 600 }}>{new Date(expandedData.createdAt).toLocaleDateString()}</p>
+                          </div>
+                        </div>
 
-                  <ProgressBar totalRaised={fra.totalRaised ?? 0} targetAmount={fra.targetAmount ?? 0} />
+                        <ProgressBar totalRaised={exFra.totalRaised ?? 0} targetAmount={exFra.targetAmount ?? 0} />
 
-                  <div style={{ marginTop: '0.75rem' }}>
-                    <button
-                      className="ua-btn-ghost"
-                      style={{
-                        color: '#e53e3e',
-                        opacity: isLoading ? 0.5 : 1,
-                        cursor: isLoading ? 'not-allowed' : 'pointer',
-                      }}
-                      onClick={(e) => handleUnfavourite(e, fra._id, fav._id)}
-                      disabled={isLoading}
-                    >
-                      {isLoading ? '…' : '♥ Remove from favourites'}
-                    </button>
-                  </div>
+                        <div style={{ marginTop: '0.75rem' }}>
+                          <button
+                            className="ua-btn-ghost"
+                            style={{
+                              color: '#e53e3e',
+                              opacity: isLoading ? 0.5 : 1,
+                              cursor: isLoading ? 'not-allowed' : 'pointer',
+                            }}
+                            onClick={(e) => handleUnfavourite(e, exFra._id, fav._id)}
+                            disabled={isLoading}
+                          >
+                            {isLoading ? '…' : '♥ Remove from favourites'}
+                          </button>
+                        </div>
+                      </>
+                    )
+                  })()}
                 </div>
               )}
             </div>

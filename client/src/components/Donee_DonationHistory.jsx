@@ -8,7 +8,7 @@ function useCategories() {
   useEffect(() => {
     const load = async () => {
       try {
-        const res  = await fetch(CAT_API, { credentials: 'include' })
+        const res  = await fetch(`${CAT_API}/search?query=`, { credentials: 'include' })
         const data = await res.json()
         if (data.success) setCategories((data.data ?? []).filter(c => c.isActive === true))
       } catch { /* ignore */ }

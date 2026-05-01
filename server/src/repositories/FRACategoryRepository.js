@@ -11,7 +11,7 @@ class FRACategoryRepository {
   }
 
   async findAll() {
-    return await FRACategory.find()
+    return await FRACategory.find().select('name isActive')
   }
 
   async update(id, data) {
@@ -31,7 +31,7 @@ class FRACategoryRepository {
   async search(query) {
     return await FRACategory.find({
       name: { $regex: query, $options: 'i' }
-    })
+    }).select('name isActive')
   }
 
   async findByName(name) {

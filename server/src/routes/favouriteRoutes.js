@@ -11,6 +11,6 @@ const router = express.Router()
 router.get('/search', requireAuth, requirePermission('donating'), (req, res) => SearchFavouriteController.searchFavourite(req, res))
 router.post('/:id', requireAuth, requirePermission('donating'), (req, res) => SaveFavouriteController.saveFavourite(req, res))
 router.delete('/:id', requireAuth, requirePermission('donating'), (req, res) => RemoveFavouriteController.removeFavourite(req, res))
-router.get('/', requireAuth, requirePermission('donating'), (req, res) => ViewFavouriteController.viewFavourite(req, res))
+router.get('/:id', requireAuth, requirePermission('donating'), (req, res) => ViewFavouriteController.viewFavourite(req, res))
 
 export default router

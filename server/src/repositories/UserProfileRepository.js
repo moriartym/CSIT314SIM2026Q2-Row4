@@ -15,7 +15,7 @@ class UserProfileRepository {
   }
 
   async findAll() {
-    return await UserProfile.find()
+    return await UserProfile.find().select('profileName isActive')
   }
 
   async update(id, data) {
@@ -29,14 +29,14 @@ class UserProfileRepository {
     return await UserProfile.findByIdAndUpdate(
       id,
       { isActive: !userProfile.isActive },
-      { new: true }
+      { returnDocument: 'after' }
     )
   }
 
   async search(query) {
     return await UserProfile.find({
       profileName: { $regex: query, $options: 'i' }
-    })
+    }).select('profileName isActive')
   }
 }
 

@@ -5,9 +5,13 @@ class FavouriteRepository {
     const favourite = new Favourite({ donee: doneeId, fra: fraId })
     return await favourite.save()
   }
+  
+  async findById(id) {
+    return await Favourite.findById(id).populate('fra')
+  }
 
   async findByDonee(doneeId) {
-    return await Favourite.find({ donee: doneeId }).populate('fra')
+    return await Favourite.find({ donee: doneeId }).populate('fra', 'title status targetAmount category')
   }
 
   async findByDoneeAndFra(doneeId, fraId) {
@@ -19,7 +23,7 @@ class FavouriteRepository {
   }
 
   async searchByDonee(doneeId, query) {
-    const favourites = await Favourite.find({ donee: doneeId }).populate('fra')
+    const favourites = await Favourite.find({ donee: doneeId }).populate('fra', 'title status targetAmount category')
     return favourites.filter(f =>
       f.fra?.title?.match(new RegExp(query, 'i'))
     )
@@ -29,5 +33,4 @@ class FavouriteRepository {
     return await Favourite.findOneAndDelete({ donee: doneeId, fra: fraId })
   }
 }
-
 export default new FavouriteRepository()

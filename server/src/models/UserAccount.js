@@ -7,7 +7,6 @@ const userSchema = new mongoose.Schema({
   dateOfBirth: { type: Date },
   phone: { type: String, trim: true },
   address: { type: String, trim: true },
-  profilePicture: { type: String },
   isActive: { type: Boolean, default: true },
   userProfile: {
     type: mongoose.Schema.Types.ObjectId,

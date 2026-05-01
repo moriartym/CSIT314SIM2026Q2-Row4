@@ -74,11 +74,13 @@ export default function UserProfile() {
 }
 
 function ViewProfiles() {
-  const [profiles, setProfiles] = useState([])
-  const [loading, setLoading] = useState(false)
-  const [error, setError] = useState(null)
-  const [expandedId, setExpandedId] = useState(null)
-  const [search, setSearch] = useState('')
+  const [profiles, setProfiles]               = useState([])
+  const [loading, setLoading]                 = useState(false)
+  const [error, setError]                     = useState(null)
+  const [expandedId, setExpandedId]           = useState(null)
+  const [expandedData, setExpandedData]       = useState(null)
+  const [expandedLoading, setExpandedLoading] = useState(false)
+  const [search, setSearch]                   = useState('')
 
   const fetch_ = async () => {
     setLoading(true)
@@ -100,6 +102,8 @@ function ViewProfiles() {
   const searchProfile = async (e) => {
     const query = e.target.value
     setSearch(query)
+    setExpandedId(null)
+    setExpandedData(null)
     if (!query.trim()) { fetch_(); return }
     try {
       const res = await fetch(`${API}/search?query=${encodeURIComponent(query)}`, { credentials: 'include' })
@@ -111,11 +115,38 @@ function ViewProfiles() {
     }
   }
 
+  const handleExpand = async (id) => {
+    if (expandedId === id) {
+      setExpandedId(null)
+      setExpandedData(null)
+      return
+    }
+    setExpandedId(id)
+    setExpandedData(null)
+    setExpandedLoading(true)
+    try {
+      const res = await fetch(`${API}/${id}`, { credentials: 'include' })
+      const data = await res.json()
+      if (data.success) setExpandedData(data.data)
+    } catch (err) {
+      console.error(err)
+    } finally {
+      setExpandedLoading(false)
+    }
+  }
+
   const suspendProfile = async (id) => {
     try {
       const res = await fetch(`${API}/${id}/suspend`, { method: 'PATCH', credentials: 'include' })
       const data = await res.json()
-      if (data.success) search.trim() ? searchProfile({ target: { value: search } }) : fetch_()
+      if (data.success) {
+        if (expandedId === id) {
+          const res2  = await fetch(`${API}/${id}`, { credentials: 'include' })
+          const data2 = await res2.json()
+          if (data2.success) setExpandedData(data2.data)
+        }
+        search.trim() ? searchProfile({ target: { value: search } }) : fetch_()
+      }
     } catch (err) {
       console.error(err)
     }
@@ -143,7 +174,7 @@ function ViewProfiles() {
             <div key={p._id} className="ua-row ua-row-expandable">
               <div
                 style={{ display: 'flex', alignItems: 'center', gap: '12px' }}
-                onClick={() => setExpandedId(isExpanded ? null : p._id)}
+                onClick={() => handleExpand(p._id)}
               >
                 <div className="ua-row-dot" style={{ background: p.isActive ? '#4fffb0' : '#e24b4a' }} />
                 <div className="ua-row-body">
@@ -156,28 +187,33 @@ function ViewProfiles() {
 
               {isExpanded && (
                 <div style={{ padding: '0.75rem 1rem', borderTop: '1px solid rgba(255,255,255,0.08)', marginTop: '0.5rem' }}>
-                  <p className="ua-muted" style={{ fontSize: '0.72rem' }}>ID: {p._id}</p>
-                  <p className="ua-row-name">{p.profileName}</p>
-                  {p.description && <p className="ua-row-desc">{p.description}</p>}
+                  {expandedLoading && <p className="ua-muted">Loading...</p>}
+                  {!expandedLoading && expandedData && (
+                    <>
+                      <p className="ua-muted" style={{ fontSize: '0.72rem' }}>ID: {expandedData._id}</p>
+                      <p className="ua-row-name">{expandedData.profileName}</p>
+                      {expandedData.description && <p className="ua-row-desc">{expandedData.description}</p>}
 
-                  {p.permissions?.length > 0 && (
-                    <div style={{ display: 'flex', flexWrap: 'wrap', gap: '6px', marginTop: '8px' }}>
-                      {p.permissions.map(perm => (
-                        <span key={perm} className="ua-perm-badge">
-                          {perm.replace(/_/g, ' ')}
+                      {expandedData.permissions?.length > 0 && (
+                        <div style={{ display: 'flex', flexWrap: 'wrap', gap: '6px', marginTop: '8px' }}>
+                          {expandedData.permissions.map(perm => (
+                            <span key={perm} className="ua-perm-badge">
+                              {perm.replace(/_/g, ' ')}
+                            </span>
+                          ))}
+                        </div>
+                      )}
+
+                      <div className="ua-row-actions" style={{ marginTop: '0.75rem' }}>
+                        <span className={`ua-badge ${expandedData.isActive ? 'ua-badge-active' : 'ua-badge-inactive'}`}>
+                          {expandedData.isActive ? 'Active' : 'Suspended'}
                         </span>
-                      ))}
-                    </div>
+                        <button className="ua-btn-ghost" onClick={(e) => { e.stopPropagation(); suspendProfile(expandedData._id) }}>
+                          {expandedData.isActive ? 'Suspend' : 'Activate'}
+                        </button>
+                      </div>
+                    </>
                   )}
-
-                  <div className="ua-row-actions" style={{ marginTop: '0.75rem' }}>
-                    <span className={`ua-badge ${p.isActive ? 'ua-badge-active' : 'ua-badge-inactive'}`}>
-                      {p.isActive ? 'Active' : 'Suspended'}
-                    </span>
-                    <button className="ua-btn-ghost" onClick={(e) => { e.stopPropagation(); suspendProfile(p._id) }}>
-                      {p.isActive ? 'Suspend' : 'Activate'}
-                    </button>
-                  </div>
                 </div>
               )}
             </div>
