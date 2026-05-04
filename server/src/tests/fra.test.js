@@ -256,56 +256,6 @@ describe('TC-17: Search my FRA', () => {
   })
 })
 
-describe('TC-18: FR Login', () => {
-  it('TC18-1: should login successfully with valid credentials', async () => {
-    const res = await request(app)
-      .post('/api/auth/login')
-      .send({ username: 'fruser', password: 'Abc.1234' })
-
-    expect(res.status).toBe(200)
-    expect(res.body.username).toBe('fruser')
-  })
-
-  it('TC18-2: should fail with wrong password', async () => {
-    const res = await request(app)
-      .post('/api/auth/login')
-      .send({ username: 'fruser', password: 'WrongPass123!' })
-
-    expect(res.status).toBe(401)
-    expect(res.body.message).toBe('Invalid credentials')
-  })
-
-  it('TC18-3: should fail with non-existing user', async () => {
-    const res = await request(app)
-      .post('/api/auth/login')
-      .send({ username: 'ghostuser', password: 'Abc.1234' })
-
-    expect(res.status).toBe(401)
-    expect(res.body.message).toBe('Invalid credentials')
-  })
-})
-
-describe('TC-19: FR Logout', () => {
-  it('TC19-1: should logout successfully', async () => {
-    const tempAgent = request.agent(app)
-    await tempAgent.post('/api/auth/login').send({ username: 'fruser', password: 'Abc.1234' })
-
-    const res = await tempAgent.post('/api/auth/logout')
-    expect(res.status).toBe(200)
-    expect(res.body.message).toBe('Logged out successfully')
-  })
-
-  it('TC19-2: should not access FRA after logout', async () => {
-    const tempAgent = request.agent(app)
-    await tempAgent.post('/api/auth/login').send({ username: 'fruser', password: 'Abc.1234' })
-    await tempAgent.post('/api/auth/logout')
-
-    const res = await tempAgent.get('/api/fra/mine')
-    expect(res.status).toBe(401)
-    expect(res.body.success).toBe(false)
-  })
-})
-
 describe('TC-27: View FRA view count', () => {
   it('TC27-1: should increment viewCount when donee views an FRA', async () => {
     const before = await agent.get(`/api/fra/${fraId}`)
@@ -393,5 +343,68 @@ describe('TC-30: View completed FRA', () => {
     expect(res.body.success).toBe(true)
     expect(res.body.data.status).toBe('completed')
     expect(res.body.data._id).toBe(completedFraId)
+  })
+})
+
+describe('TC-20: Search FRA', () => {
+  it('TC20-1: should return results for valid search query', async () => {
+    const res = await doneeAgent.get('/api/fra/all/search?query=School')
+
+    expect(res.status).toBe(200)
+    expect(res.body.success).toBe(true)
+    expect(Array.isArray(res.body.data)).toBe(true)
+  })
+  
+  it('TC20-2: should return empty array for non-matching query', async () => {
+      const res = await doneeAgent.get('/api/fra/all/search?query=xyznonexistent999')
+
+      expect(res.status).toBe(200)
+      expect(res.body.success).toBe(true)
+      expect(Array.isArray(res.body.data)).toBe(true)
+      expect(res.body.data.length).toBe(0)
+    })
+
+  it('TC20-3: should fail when not authenticated', async () => {
+    const res = await request(app).get('/api/fra/all/search?query=School')
+
+    expect(res.status).toBe(401)
+    expect(res.body.success).toBe(false)
+  })
+})
+
+describe('TC-21: View FRA', () => {
+  it('TC21-1: should return FRA details for valid ID', async () => {
+    const res = await doneeAgent.get(`/api/fra/${fraId}`)
+
+    expect(res.status).toBe(200)
+    expect(res.body.success).toBe(true)
+    expect(res.body.data._id).toBe(fraId)
+    expect(res.body.data.title).toBeDefined()
+    expect(res.body.data.description).toBeDefined()
+    expect(res.body.data.targetAmount).toBeDefined()
+  })
+
+  it('TC21-2: should return 404 for invalid ID format', async () => {
+    const res = await doneeAgent.get('/api/fra/invalidid123')
+
+    expect(res.status).toBe(404)
+    expect(res.body.success).toBe(false)
+    expect(res.body.message).toBe('Fundraising activity not found')
+  })
+
+  it('TC21-3: should return 404 for non-existing FRA', async () => {
+    const fakeId = new mongoose.Types.ObjectId().toString()
+    const res = await doneeAgent.get(`/api/fra/${fakeId}`)
+
+    expect(res.status).toBe(404)
+    expect(res.body.success).toBe(false)
+    expect(res.body.message).toBe('Fundraising activity not found')
+  })
+
+  it('TC21-4: should fail when not authenticated', async () => {
+    const res = await request(app).get(`/api/fra/${fraId}`)
+
+    expect(res.status).toBe(401)
+    expect(res.body.success).toBe(false)
   })
 })

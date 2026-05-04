@@ -26,10 +26,10 @@ updateMyFRAController.js → Story 15 - FR -> SEARCH FOR FRA CATEGORY
 suspendMyFRAController.js → Story 16 - FR
 markCompleteFRAController.js → No story (ADDITIONAL) - FR
 viewMyCompletedFRAController.js → Story 30 - FR -> SEARCH FOR TOTAL DONATION IN BACKGROUND
-searchFRAController.js → Story 17 - Story 20 - FR
+searchFRAController.js → Story 17 - FR
 viewFRAController.js → Story 21 - Story 32 - FR - DONEE -> SEARCH FOR TOTAL DONATION IN BACKGROUND
 viewFRAViewCountController.js → Story 27 & 28 - DONEE - FR -> SEARCH FOR TOTAL DONATION IN BACKGROUND
-searchAllFRAController.js → Story 29 - DONEE - FR
+searchAllFRAController.js → Story 29 - Story 20 - DONEE - FR
 
 favourite/ OK
 
