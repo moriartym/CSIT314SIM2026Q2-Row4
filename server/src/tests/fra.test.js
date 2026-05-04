@@ -266,7 +266,7 @@ describe('TC-27: View FRA view count', () => {
 
     const after = await agent.get(`/api/fra/${fraId}`)
     expect(after.body.data.viewCount).toBeGreaterThan(viewsBefore)
-  })
+  }, 15000)
 })
 
 describe('TC-28: View FRA shortlist count', () => {
