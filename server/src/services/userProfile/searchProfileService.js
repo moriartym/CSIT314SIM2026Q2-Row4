@@ -2,9 +2,7 @@ import UserProfileRepository from '../../repositories/UserProfileRepository.js'
 
 class SearchProfileService {
   async searchProfile(query) {
-    if (!query || query.trim() === '') {
-      return await UserProfileRepository.findAll()
-    }
+    if (!query || query.trim() === '') return []
     return await UserProfileRepository.search(query)
   }
 }

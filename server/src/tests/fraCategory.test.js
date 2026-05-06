@@ -164,15 +164,7 @@ describe('TC-37: Search FRA Categories', () => {
     expect(res.body.data.length).toBeGreaterThan(0)
   })
 
-  it('TC37-2: should return all categories when query is empty', async () => {
-    const res = await agent.get('/api/fra-categories/search?query=')
-
-    expect(res.status).toBe(200)
-    expect(res.body.success).toBe(true)
-    expect(Array.isArray(res.body.data)).toBe(true)
-  })
-
-  it('TC37-3: should return empty array for non-matching query', async () => {
+  it('TC37-2: should return empty array for non-matching query', async () => {
     const res = await agent.get('/api/fra-categories/search?query=zzznomatchxxx')
 
     expect(res.status).toBe(200)

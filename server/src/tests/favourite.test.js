@@ -115,7 +115,7 @@ describe('TC-22: Save FRA to Favourites', () => {
 
 describe('TC-23: View Favourite List', () => {
   it('TC23-1: should return a single favourite by valid ID', async () => {
-    const listRes = await doneeAgent.get('/api/favourites/search?query=')
+    const listRes = await doneeAgent.get('/api/favourites')
     const favouriteId = listRes.body.data[0]._id
     const res = await doneeAgent.get(`/api/favourites/${favouriteId}`)
     expect(res.status).toBe(200)
@@ -124,7 +124,7 @@ describe('TC-23: View Favourite List', () => {
   })
 
   it('TC23-2: should fail when not authenticated', async () => {
-    const listRes = await doneeAgent.get('/api/favourites/search?query=')
+    const listRes = await doneeAgent.get('/api/favourites')
     const favouriteId = listRes.body.data[0]._id
     const res = await request(app).get(`/api/favourites/${favouriteId}`)
     expect(res.status).toBe(401)
@@ -146,12 +146,5 @@ describe('TC-24: Search Favourite List', () => {
     expect(res.status).toBe(200)
     expect(res.body.success).toBe(true)
     expect(res.body.data.length).toBe(0)
-  })
-
-  it('TC24-3: should return all favourites when query is empty', async () => {
-    const res = await doneeAgent.get('/api/favourites/search?query=')
-    expect(res.status).toBe(200)
-    expect(res.body.success).toBe(true)
-    expect(Array.isArray(res.body.data)).toBe(true)
   })
 })

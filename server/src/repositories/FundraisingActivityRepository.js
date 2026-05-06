@@ -83,12 +83,21 @@ class FundraisingActivityRepository {
     return result
   }
 
-  async findAllByUser(userId) {
-    const fras = await FundraisingActivity
-      .find({ createdBy: userId })
-      .select('title status targetAmount category viewCount shortlistCount')
-      .populate('category', 'name')
-    return this._attachProgress(fras)
+  async findAllByUser(userId, limit = 5, skip = 0, category = '') {
+    const match = { createdBy: new mongoose.Types.ObjectId(userId) }
+    if (category && mongoose.Types.ObjectId.isValid(category)) {
+      match.category = new mongoose.Types.ObjectId(category)
+    }
+    const [fras, total] = await Promise.all([
+      FundraisingActivity.find(match)
+        .select('title status targetAmount category viewCount shortlistCount')
+        .populate('category', 'name')
+        .skip(Number(skip))
+        .limit(Number(limit)),
+      FundraisingActivity.countDocuments(match)
+    ])
+    const data = await this._attachProgress(fras)
+    return { data, total }
   }
 
   async findCompletedByUser(userId, filters = {}) {
@@ -106,27 +115,62 @@ class FundraisingActivityRepository {
     return this._attachProgress(fras)
   }
 
-  async searchByUser(userId, query) {
-    const fras = await FundraisingActivity.find({
-      createdBy: userId,
-      title: { $regex: query, $options: 'i' },
-    })
-      .select('title status targetAmount category viewCount shortlistCount')
-      .populate('category', 'name')
-    return this._attachProgress(fras)
+  async searchByUser(userId, query, limit = 5, skip = 0, category = '') {
+    if (!query || !query.trim()) throw new Error('Search query is required')
+    const match = {
+      createdBy: new mongoose.Types.ObjectId(userId),
+      title: { $regex: query.trim(), $options: 'i' }
+    }
+    if (category && mongoose.Types.ObjectId.isValid(category)) {
+      match.category = new mongoose.Types.ObjectId(category)
+    }
+    const [fras, total] = await Promise.all([
+      FundraisingActivity.find(match)
+        .select('title status targetAmount category viewCount shortlistCount')
+        .populate('category', 'name')
+        .skip(Number(skip))
+        .limit(Number(limit)),
+      FundraisingActivity.countDocuments(match)
+    ])
+    const data = await this._attachProgress(fras)
+    return { data, total }
   }
 
-  async searchAll(query, status = 'active') {
+  async listAll(status = 'active', limit = 5, skip = 0, category = '') {
     const match = { status }
-    if (query && query.trim()) {
-      match.title = { $regex: query, $options: 'i' }
+    if (category && mongoose.Types.ObjectId.isValid(category)) {
+      match.category = new mongoose.Types.ObjectId(category)
     }
-    const fras = await FundraisingActivity.find(match)
-      .select('title status targetAmount category viewCount shortlistCount completedAt')
-      .populate('createdBy', 'username')
-      .populate('category', 'name')
-    
-    return this._attachProgress(fras)
+    const [fras, total] = await Promise.all([
+      FundraisingActivity.find(match)
+        .select('title status targetAmount category viewCount shortlistCount completedAt')
+        .populate('createdBy', 'username')
+        .populate('category', 'name')
+        .skip(Number(skip))
+        .limit(Number(limit)),
+      FundraisingActivity.countDocuments(match)
+    ])
+    const data = await this._attachProgress(fras)
+    return { data, total }
+  }
+
+  async searchAll(query, status = 'active', limit = 5, skip = 0, category = '') {
+    if (!query || !query.trim()) throw new Error('Search query is required')
+    const match = { status, title: { $regex: query.trim(), $options: 'i' } }
+    if (category && mongoose.Types.ObjectId.isValid(category)) {
+      match.category = new mongoose.Types.ObjectId(category)
+    }
+    const [fras, total] = await Promise.all([
+      FundraisingActivity.find(match)
+        .select('title status targetAmount category viewCount shortlistCount completedAt')
+        .populate('createdBy', 'username')
+        .populate('category', 'name')
+        .skip(Number(skip))
+        .limit(Number(limit)),
+      FundraisingActivity.countDocuments(match)
+    ])
+    const data = await this._attachProgress(fras)
+    return { data, total }
   }
 
   async findByDateRange(from, to) {
