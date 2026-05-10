@@ -1,8 +1,8 @@
 import { useState } from 'react'
-import UA_UserProfile_Search from './pages/UA_UserProfile_Search'
-import UA_UserProfile_Create from './pages/UA_UserProfile_Create'
-import UA_UserProfile_View   from './pages/UA_UserProfile_View'
-import UA_UserProfile_Update from './pages/UA_UserProfile_Update'
+import SearchUserProfile from './pages/UA_UserProfile_Search'
+import CreateUserProfile from './pages/UA_UserProfile_Create'
+import ViewUserProfile  from './pages/UA_UserProfile_View'
+import UpdateUserProfile from './pages/UA_UserProfile_Update'
 
 export default function UserProfile() {
   const [page, setPage]           = useState('search')
@@ -20,10 +20,10 @@ export default function UserProfile() {
         <p className="ua-subtitle">Manage roles available on the platform</p>
       </div>
 
-      {page === 'search' && <UA_UserProfile_Search onNavigate={navigate} />}
-      {page === 'create' && <UA_UserProfile_Create onNavigate={navigate} />}
-      {page === 'view'   && <UA_UserProfile_View   profileId={selectedId} onNavigate={navigate} />}
-      {page === 'update' && <UA_UserProfile_Update profileId={selectedId} onNavigate={navigate} />}
+      {page === 'search' && <SearchUserProfile onNavigate={navigate} />}
+      {page === 'create' && <CreateUserProfile onNavigate={navigate} />}
+      {page === 'view'   && <ViewUserProfile  profileId={selectedId} onNavigate={navigate} />}
+      {page === 'update' && <UpdateUserProfile profileId={selectedId} onNavigate={navigate} />}
     </div>
   )
 }

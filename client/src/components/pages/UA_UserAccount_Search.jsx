@@ -2,7 +2,7 @@ import { useState } from 'react'
 
 const API = 'http://localhost:3001/api/users-account'
 
-export default function UA_UserAccount_Search({ onNavigate }) {
+export default function SearchUserAccount({ onNavigate }) {
   const [query, setQuery]       = useState('')
   const [accounts, setAccounts] = useState([])
   const [loading, setLoading]   = useState(false)

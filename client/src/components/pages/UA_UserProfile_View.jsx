@@ -18,7 +18,7 @@ function ReadField({ label, value }) {
   )
 }
 
-export default function UA_UserProfile_View({ profileId, onNavigate }) {
+export default function ViewUserProfile({ profileId, onNavigate }) {
   const [profile, setProfile] = useState(null)
   const [loading, setLoading] = useState(true)
   const [error, setError]     = useState(null)

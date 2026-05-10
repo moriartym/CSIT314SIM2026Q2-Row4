@@ -1,8 +1,8 @@
 import { useState } from 'react'
-import UA_UserAccount_Search from './pages/UA_UserAccount_Search'
-import UA_UserAccount_Create from './pages/UA_UserAccount_Create'
-import UA_UserAccount_View   from './pages/UA_UserAccount_View'
-import UA_UserAccount_Update from './pages/UA_UserAccount_Update'
+import SearchUserAccount from './pages/UA_UserAccount_Search'
+import CreateUserAccount from './pages/UA_UserAccount_Create'
+import ViewUserAccount   from './pages/UA_UserAccount_View'
+import UpdateUserAccount from './pages/UA_UserAccount_Update'
 
 export default function UserAccount() {
   const [page, setPage]           = useState('search')
@@ -20,10 +20,10 @@ export default function UserAccount() {
         <p className="ua-subtitle">Manage user accounts on the platform</p>
       </div>
 
-      {page === 'search' && <UA_UserAccount_Search onNavigate={navigate} />}
-      {page === 'create' && <UA_UserAccount_Create onNavigate={navigate} />}
-      {page === 'view'   && <UA_UserAccount_View   accountId={selectedId} onNavigate={navigate} />}
-      {page === 'update' && <UA_UserAccount_Update accountId={selectedId} onNavigate={navigate} />}
+      {page === 'search' && <SearchUserAccount onNavigate={navigate} />}
+      {page === 'create' && <CreateUserAccount onNavigate={navigate} />}
+      {page === 'view'   && <ViewUserAccount   accountId={selectedId} onNavigate={navigate} />}
+      {page === 'update' && <UpdateUserAccount accountId={selectedId} onNavigate={navigate} />}
     </div>
   )
 }

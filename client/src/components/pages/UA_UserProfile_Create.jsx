@@ -27,7 +27,7 @@ function PermissionCheckboxes({ selected, onChange }) {
   )
 }
 
-export default function UA_UserProfile_Create({ onNavigate }) {
+export default function CreateUserProfile({ onNavigate }) {
   const [form, setForm]       = useState({ profileName: '', description: '', permissions: [] })
   const [message, setMessage] = useState(null)
 

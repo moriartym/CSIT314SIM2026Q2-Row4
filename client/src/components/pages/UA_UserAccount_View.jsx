@@ -11,7 +11,7 @@ function ReadField({ label, value }) {
   )
 }
 
-export default function UA_UserAccount_View({ accountId, onNavigate }) {
+export default function ViewUserAccount({ accountId, onNavigate }) {
   const [account, setAccount] = useState(null)
   const [loading, setLoading] = useState(true)
   const [error, setError]     = useState(null)

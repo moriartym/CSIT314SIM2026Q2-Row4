@@ -2,7 +2,7 @@ import { useState } from 'react'
 
 const API = 'http://localhost:3001/api/user-profiles'
 
-export default function UA_UserProfile_Search({ onNavigate }) {
+export default function SearchUserProfile({ onNavigate }) {
   const [query, setQuery]     = useState('')
   const [profiles, setProfiles] = useState([])
   const [loading, setLoading] = useState(false)

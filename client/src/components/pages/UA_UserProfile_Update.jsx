@@ -27,7 +27,7 @@ function PermissionCheckboxes({ selected, onChange }) {
   )
 }
 
-export default function UA_UserProfile_Update({ profileId, onNavigate }) {
+export default function UpdateUserProfile({ profileId, onNavigate }) {
   const [query, setQuery]       = useState('')
   const [results, setResults]   = useState([])
   const [searching, setSearching] = useState(false)

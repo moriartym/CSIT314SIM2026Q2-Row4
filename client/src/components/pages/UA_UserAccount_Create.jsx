@@ -29,7 +29,7 @@ function Field({ label, error, children }) {
   )
 }
 
-export default function UA_UserAccount_Create({ onNavigate }) {
+export default function CreateUserAccount({ onNavigate }) {
   const [profiles, setProfiles] = useState([])
   const [form, setForm]         = useState({ username: '', email: '', password: '', userProfile: '', dateOfBirth: '', phone: '', address: '' })
   const [errors, setErrors]     = useState({})
@@ -42,7 +42,7 @@ export default function UA_UserAccount_Create({ onNavigate }) {
       .catch(() => {})
   }, [])
 
-  const effectiveProfile = form.userProfile || profiles[0]?._id || ''
+  const profileName = form.userProfile || profiles[0]?._id || ''
 
   const handleChange = (e) => {
     const { name, value } = e.target
@@ -56,9 +56,9 @@ export default function UA_UserAccount_Create({ onNavigate }) {
     const pwErr    = validate('password', form.password)
     if (!form.username.trim()) { setErrors({ username: 'Username is required', email: emailErr, password: pwErr }); return }
     if (emailErr || pwErr)     { setErrors({ email: emailErr, password: pwErr }); return }
-    if (!effectiveProfile)     { setErrors({ userProfile: 'Profile is required' }); return }
+    if (!profileName)     { setErrors({ userProfile: 'Profile is required' }); return }
 
-    const body = { username: form.username.trim(), email: form.email.trim(), password: form.password, userProfile: effectiveProfile }
+    const body = { username: form.username.trim(), email: form.email.trim(), password: form.password, userProfile: profileName }
     if (form.dateOfBirth)    body.dateOfBirth = form.dateOfBirth
     if (form.phone.trim())   body.phone       = form.phone.trim()
     if (form.address.trim()) body.address     = form.address.trim()
@@ -98,7 +98,7 @@ export default function UA_UserAccount_Create({ onNavigate }) {
       </Field>
 
       <Field label="User Profile" error={errors.userProfile}>
-        <select className="ua-input" name="userProfile" value={effectiveProfile} onChange={handleChange}>
+        <select className="ua-input" name="userProfile" value={profileName} onChange={handleChange}>
           {profiles.map(p => <option key={p._id} value={p._id}>{p.profileName}</option>)}
         </select>
       </Field>

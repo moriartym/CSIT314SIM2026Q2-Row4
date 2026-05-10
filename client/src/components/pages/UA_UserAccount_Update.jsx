@@ -27,7 +27,7 @@ function Field({ label, error, children }) {
 
 const blankForm = () => ({ username: '', email: '', password: '', userProfile: '', dateOfBirth: '', phone: '', address: '' })
 
-export default function UA_UserAccount_Update({ accountId, onNavigate }) {
+export default function UpdateUserAccount({ accountId, onNavigate }) {
   const [profiles, setProfiles]         = useState([])
   const [search, setSearch]             = useState('')
   const [results, setResults]           = useState([])

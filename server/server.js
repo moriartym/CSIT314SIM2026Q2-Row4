@@ -1,12 +1,17 @@
 import mongoose from 'mongoose'
 import app from './index.js'
 import dotenv from 'dotenv'
+import dns from 'dns'
 
 dotenv.config()
 
 const PORT = process.env.PORT || 3001
 
-mongoose.connect(process.env.MONGO_URI)
+dns.setServers(['8.8.8.8', '8.8.4.4']);
+
+mongoose.connect(process.env.MONGO_URI, {
+  family: 4
+})
   .then(() => {
     console.log('MongoDB connected')
 
