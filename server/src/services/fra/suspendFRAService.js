@@ -1,6 +1,6 @@
 import FundraisingActivityRepository from '../../repositories/FundraisingActivityRepository.js'
 
-class SuspendMyFRAService {
+class SuspendFRAService {
   async suspendFRA(id, userId) {
     const fra = await FundraisingActivityRepository.findById(id)
     if (!fra) throw new Error('Fundraising activity not found')
@@ -9,4 +9,4 @@ class SuspendMyFRAService {
   }
 }
 
-export default new SuspendMyFRAService()
+export default new SuspendFRAService()

@@ -1,10 +1,10 @@
 import express from 'express'
-import CreateMyFRAController from '../controllers/fra/createMyFRAController.js'
+import CreateFRAController from '../controllers/fra/createFRAController.js'
 import ListMyFRAController from '../controllers/fra/listMyFRAController.js'
 import ViewFRAController from '../controllers/fra/viewFRAController.js'
 import ViewMyCompletedFRAController from '../controllers/fra/viewMyCompletedFRAController.js'
-import UpdateMyFRAController from '../controllers/fra/updateMyFRAController.js'
-import SuspendMyFRAController from '../controllers/fra/suspendMyFRAController.js'
+import UpdateFRAController from '../controllers/fra/updateFRAController.js'
+import SuspendFRAController from '../controllers/fra/suspendFRAController.js'
 import MarkCompleteFRAController from '../controllers/fra/markCompleteFRAController.js'
 import SearchFRAController from '../controllers/fra/searchFRAController.js'
 import SearchAllFRAController from '../controllers/fra/searchAllFRAController.js'
@@ -16,7 +16,7 @@ import CreateDonationController from '../controllers/donation/createDonationCont
 import { requireAuth, requirePermission } from '../middleware/authMiddleware.js'
 
 const router = express.Router()
-router.post('/', requireAuth, requirePermission('fundraising'), (req, res) => CreateMyFRAController.createFRA(req, res))
+router.post('/', requireAuth, requirePermission('fundraising'), (req, res) => CreateFRAController.createFRA(req, res))
 router.get('/mine', requireAuth, requirePermission('fundraising'), (req, res) => ListMyFRAController.listMyFRA(req, res))
 router.get('/search', requireAuth, requirePermission('fundraising'), (req, res) => SearchFRAController.searchFRA(req, res))
 router.get('/completed', requireAuth, requirePermission('fundraising'), (req, res) => ViewMyCompletedFRAController.viewCompletedFRA(req, res))
@@ -28,7 +28,7 @@ router.get('/donations/search', requireAuth, requirePermission('donating'), (req
 router.patch('/:id/complete', requireAuth, requirePermission('fundraising'), (req, res) => MarkCompleteFRAController.completeFRA(req, res))
 router.post('/:id/view', requireAuth, requirePermission('donating', 'fundraising'), (req, res) => ViewFRAViewCountController.viewFRAViewCount(req, res))
 router.get('/:id', requireAuth, requirePermission('fundraising', 'donating'), (req, res) => ViewFRAController.viewFRA(req, res))
-router.put('/:id', requireAuth, requirePermission('fundraising'), (req, res) => UpdateMyFRAController.updateFRA(req, res))
-router.patch('/:id/suspend', requireAuth, requirePermission('fundraising'), (req, res) => SuspendMyFRAController.suspendFRA(req, res))
+router.put('/:id', requireAuth, requirePermission('fundraising'), (req, res) => UpdateFRAController.updateFRA(req, res))
+router.patch('/:id/suspend', requireAuth, requirePermission('fundraising'), (req, res) => SuspendFRAController.suspendFRA(req, res))
 
 export default router

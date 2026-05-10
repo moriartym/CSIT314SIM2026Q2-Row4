@@ -13,7 +13,7 @@ function Field({ label, error, children }) {
   )
 }
 
-export default function FR_ManageFRA_Create({ onNavigate }) {
+export default function CreateFRA({ onNavigate }) {
   const [categories, setCategories] = useState([])
   const [form, setForm]             = useState({ title: '', description: '', targetAmount: '', category: '' })
   const [errors, setErrors]         = useState({})

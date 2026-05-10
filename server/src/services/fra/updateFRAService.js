@@ -1,7 +1,7 @@
 import FundraisingActivityRepository from '../../repositories/FundraisingActivityRepository.js'
 import FRACategoryRepository from '../../repositories/FRACategoryRepository.js'
 
-class UpdateMyFRAService {
+class UpdateFRAService {
   async updateFRA(id, data, userId) {
     const fra = await FundraisingActivityRepository.findById(id)
     if (!fra) throw new Error('Fundraising activity not found')
@@ -19,4 +19,4 @@ class UpdateMyFRAService {
   }
 }
 
-export default new UpdateMyFRAService()
+export default new UpdateFRAService()

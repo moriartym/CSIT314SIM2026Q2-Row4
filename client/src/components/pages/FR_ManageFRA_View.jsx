@@ -34,7 +34,7 @@ function StatusBadge({ status }) {
   return <span className={`ua-badge ${cls[status] || ''}`}>{status}</span>
 }
 
-export default function FR_ManageFRA_View({ fraId, onNavigate }) {
+export default function ViewFRA({ fraId, onNavigate }) {
   const [fra, setFra]       = useState(null)
   const [loading, setLoading] = useState(true)
   const [error, setError]   = useState(null)

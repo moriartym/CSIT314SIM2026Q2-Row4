@@ -152,10 +152,10 @@ Entity    →  models / repositories
 
 | Controller | Story |
 | --- | --- |
-| `createMyFRAController.js` | 13 |
+| `createFRAController.js` | 13 |
 | `listMyFRAController.js` | Additional - no story |
-| `updateMyFRAController.js` | 15 |
-| `suspendMyFRAController.js` | 16 |
+| `updateFRAController.js` | 15 |
+| `suspendFRAController.js` | 16 |
 | `markCompleteFRAController.js` | Additional - no story |
 | `listAllFRAController.js.js` | Additional - no story |
 | `viewMyCompletedFRAController.js` | 30 |

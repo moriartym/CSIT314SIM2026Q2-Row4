@@ -1,9 +1,9 @@
-import CreateMyFRAService from '../../services/fra/createMyFRAService.js'
+import CreateFRAService from '../../services/fra/CreateFRAService.js'
 
-class CreateMyFRAController {
+class CreateFRAController {
   async createFRA(req, res) {
     try {
-      const fra = await CreateMyFRAService.createFRA(req.body, req.userAccount._id.toString())
+      const fra = await CreateFRAService.createFRA(req.body, req.userAccount._id.toString())
       res.status(201).json({ success: true, message: 'Fundraising activity successfully created', data: fra })
     } catch (error) {
       if (error.message === 'Title is required') return res.status(400).json({ success: false, message: error.message })
@@ -15,4 +15,4 @@ class CreateMyFRAController {
   }
 }
 
-export default new CreateMyFRAController()
+export default new CreateFRAController()

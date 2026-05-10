@@ -13,7 +13,7 @@ function Field({ label, error, children }) {
   )
 }
 
-export default function FR_ManageFRA_Update({ fraId, onNavigate }) {
+export default function UpdateFRA({ fraId, onNavigate }) {
   const [categories, setCategories] = useState([])
   const [selected, setSelected]     = useState(null)
   const [form, setForm]             = useState({ title: '', description: '', targetAmount: '', category: '' })

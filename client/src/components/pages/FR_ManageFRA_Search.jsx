@@ -9,7 +9,7 @@ function StatusBadge({ status }) {
   return <span className={`ua-badge ${cls[status] || ''}`}>{status}</span>
 }
 
-export default function FR_ManageFRA_Search({ onNavigate }) {
+export default function SearchFRA({ onNavigate }) {
   const [categories, setCategories]   = useState([])
   const [fras, setFras]               = useState([])
   const [query, setQuery]             = useState('')
