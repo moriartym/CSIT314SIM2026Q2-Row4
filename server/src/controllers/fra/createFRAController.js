@@ -1,4 +1,4 @@
-import CreateFRAService from '../../services/fra/CreateFRAService.js'
+import CreateFRAService from '../../services/fra/createFRAService.js'
 
 class CreateFRAController {
   async createFRA(req, res) {
