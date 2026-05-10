@@ -12,7 +12,7 @@ function Field({ label, error, children }) {
   )
 }
 
-export default function PM_FRACategory_Create({ onNavigate }) {
+export default function CreateFRACategory({ onNavigate }) {
   const [form, setForm]       = useState({ name: '', description: '' })
   const [errors, setErrors]   = useState({})
   const [message, setMessage] = useState(null)

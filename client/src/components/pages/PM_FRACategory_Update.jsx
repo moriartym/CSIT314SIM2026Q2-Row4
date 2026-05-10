@@ -12,7 +12,7 @@ function Field({ label, error, children }) {
   )
 }
 
-export default function PM_FRACategory_Update({ categoryId, onNavigate }) {
+export default function UpdateFRACategory({ categoryId, onNavigate }) {
   const [selected, setSelected] = useState(null)
   const [form, setForm]         = useState({ name: '', description: '' })
   const [errors, setErrors]     = useState({})

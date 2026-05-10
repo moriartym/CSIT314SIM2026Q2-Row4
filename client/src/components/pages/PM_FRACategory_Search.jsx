@@ -2,7 +2,7 @@ import { useState } from 'react'
 
 const API = 'http://localhost:3001/api/fra-categories'
 
-export default function PM_FRACategory_Search({ onNavigate }) {
+export default function SearchFRACategory({ onNavigate }) {
   const [query, setQuery]         = useState('')
   const [categories, setCategories] = useState([])
   const [loading, setLoading]     = useState(false)

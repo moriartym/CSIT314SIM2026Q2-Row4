@@ -1,8 +1,8 @@
 import { useState } from 'react'
-import PM_FRACategory_Search from './pages/PM_FRACategory_Search'
-import PM_FRACategory_Create from './pages/PM_FRACategory_Create'
-import PM_FRACategory_View   from './pages/PM_FRACategory_View'
-import PM_FRACategory_Update from './pages/PM_FRACategory_Update'
+import SearchFRACategory from './pages/PM_FRACategory_Search'
+import CreateFRACategory from './pages/PM_FRACategory_Create'
+import ViewFRACategory  from './pages/PM_FRACategory_View'
+import UpdateFRACategory from './pages/PM_FRACategory_Update'
 
 export default function FRACategory() {
   const [page, setPage]           = useState('search')
@@ -20,10 +20,10 @@ export default function FRACategory() {
         <p className="ua-subtitle">Manage fundraising activity categories</p>
       </div>
 
-      {page === 'search' && <PM_FRACategory_Search onNavigate={navigate} />}
-      {page === 'create' && <PM_FRACategory_Create onNavigate={navigate} />}
-      {page === 'view'   && <PM_FRACategory_View   categoryId={selectedId} onNavigate={navigate} />}
-      {page === 'update' && <PM_FRACategory_Update categoryId={selectedId} onNavigate={navigate} />}
+      {page === 'search' && <SearchFRACategory onNavigate={navigate} />}
+      {page === 'create' && <CreateFRACategory onNavigate={navigate} />}
+      {page === 'view'   && <ViewFRACategory  categoryId={selectedId} onNavigate={navigate} />}
+      {page === 'update' && <UpdateFRACategory categoryId={selectedId} onNavigate={navigate} />}
     </div>
   )
 }
