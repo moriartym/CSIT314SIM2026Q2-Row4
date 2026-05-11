@@ -5,7 +5,7 @@ import ViewFRA   from './pages/FR_ManageFRA_View'
 import UpdateFRA from './pages/FR_ManageFRA_Update'
 
 export default function FundraisingActivity() {
-  const [page, setPage]           = useState('search')
+  const [page, setPage]             = useState('search')
   const [selectedId, setSelectedId] = useState(null)
 
   const navigate = (newPage, id = null) => {
@@ -19,11 +19,10 @@ export default function FundraisingActivity() {
         <h2 className="ua-title">My Fundraising Activities</h2>
         <p className="ua-subtitle">Create and manage your fundraising campaigns</p>
       </div>
-
-      {page === 'search' && <SearchFRA onNavigate={navigate} />}
-      {page === 'create' && <CreateFRA onNavigate={navigate} />}
-      {page === 'view'   && <ViewFRA   fraId={selectedId} onNavigate={navigate} />}
-      {page === 'update' && <UpdateFRA fraId={selectedId} onNavigate={navigate} />}
+      {page === 'search' && <SearchFRA    onNavigate={navigate} />}
+      {page === 'create' && <CreateFRA    onNavigate={navigate} />}
+      {page === 'view'   && <ViewFRA      fraId={selectedId} onNavigate={navigate} />}
+      {page === 'update' && <UpdateFRA    fraId={selectedId} onNavigate={navigate} />}
     </div>
   )
 }

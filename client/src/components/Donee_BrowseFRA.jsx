@@ -73,7 +73,7 @@ function BrowseList({ onView }) {
 
   const fetchFavourites = async () => {
     try {
-      const res  = await fetch(`${FAV_API}/search?query=`, { credentials: 'include' })
+      const res  = await fetch(`${FAV_API}?limit=1000&skip=0`, { credentials: 'include' })
       const data = await res.json()
       if (data.success) setSavedIds(new Set(data.data.map(f => f.fra?._id?.toString() ?? f.fra?.toString())))
     } catch {}

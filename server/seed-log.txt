@@ -1,124 +1,124 @@
 SEED LOG
-Generated : 2026-05-06T08:38:01.943Z
+Generated : 2026-05-11T06:06:05.084Z
 Password  : Abc.1234 (all users)
 
 -- User Administrators (10) -------------------------
-  ACTIVE    | katherinekim_ua0                    | katherine.kim_ua0@gmail.com
-  SUSPENDED | charleshernandez_ua1                | charles.hernandez_ua1@proton.me
-  ACTIVE    | sarahtorres_ua2                     | sarah.torres_ua2@hotmail.com
-  ACTIVE    | elijahchavez_ua3                    | elijah.chavez_ua3@hotmail.com
-  SUSPENDED | elizabethchavez_ua4                 | elizabeth.chavez_ua4@gmail.com
-  ACTIVE    | josephward_ua5                      | joseph.ward_ua5@outlook.com
-  ACTIVE    | avarichardson_ua6                   | ava.richardson_ua6@outlook.com
-  ACTIVE    | olivianelson_ua7                    | olivia.nelson_ua7@gmail.com
-  ACTIVE    | barbaramiller_ua8                   | barbara.miller_ua8@yahoo.com
-  SUSPENDED | johnthompson_ua9                    | john.thompson_ua9@hotmail.com
+  ACTIVE    | amandakelly_ua0                     | amanda.kelly_ua0@icloud.com
+  ACTIVE    | matthewadams_ua1                    | matthew.adams_ua1@yahoo.com
+  ACTIVE    | stevenmartinez_ua2                  | steven.martinez_ua2@yahoo.com
+  ACTIVE    | stephanienelson_ua3                 | stephanie.nelson_ua3@icloud.com
+  ACTIVE    | markmorgan_ua4                      | mark.morgan_ua4@outlook.com
+  ACTIVE    | mariewatson_ua5                     | marie.watson_ua5@hotmail.com
+  ACTIVE    | jessicahernandez_ua6                | jessica.hernandez_ua6@hotmail.com
+  ACTIVE    | jenniferjackson_ua7                 | jennifer.jackson_ua7@outlook.com
+  ACTIVE    | emilymitchell_ua8                   | emily.mitchell_ua8@gmail.com
+  ACTIVE    | michaeladams_ua9                    | michael.adams_ua9@outlook.com
 
 -- Fundraisers (30) ----------------------------------
-  ACTIVE    | jasongutierrez_fr0                  | jason.gutierrez_fr0@hotmail.com
-  ACTIVE    | elijahgomez_fr1                     | elijah.gomez_fr1@proton.me
-  ACTIVE    | samanthaphillips_fr2                | samantha.phillips_fr2@icloud.com
-  ACTIVE    | stevenmorris_fr3                    | steven.morris_fr3@proton.me
-  ACTIVE    | liambaker_fr4                       | liam.baker_fr4@hotmail.com
-  ACTIVE    | barbaraanderson_fr5                 | barbara.anderson_fr5@icloud.com
-  ACTIVE    | marypeterson_fr6                    | mary.peterson_fr6@icloud.com
-  ACTIVE    | paulhernandez_fr7                   | paul.hernandez_fr7@outlook.com
-  ACTIVE    | miahoward_fr8                       | mia.howard_fr8@yahoo.com
-  ACTIVE    | danielallen_fr9                     | daniel.allen_fr9@yahoo.com
-  ACTIVE    | katherineparker_fr10                | katherine.parker_fr10@outlook.com
-  ACTIVE    | thomasjohnson_fr11                  | thomas.johnson_fr11@icloud.com
-  ACTIVE    | paulcooper_fr12                     | paul.cooper_fr12@proton.me
-  ACTIVE    | deborahgarcia_fr13                  | deborah.garcia_fr13@gmail.com
-  ACTIVE    | susanmiller_fr14                    | susan.miller_fr14@outlook.com
-  ACTIVE    | nataliereed_fr15                    | natalie.reed_fr15@icloud.com
-  ACTIVE    | isabellataylor_fr16                 | isabella.taylor_fr16@outlook.com
-  ACTIVE    | josephthompson_fr17                 | joseph.thompson_fr17@proton.me
-  ACTIVE    | joanmorris_fr18                     | joan.morris_fr18@hotmail.com
-  ACTIVE    | briandiaz_fr19                      | brian.diaz_fr19@gmail.com
-  ACTIVE    | edwardgarcia_fr20                   | edward.garcia_fr20@hotmail.com
-  ACTIVE    | briantaylor_fr21                    | brian.taylor_fr21@hotmail.com
-  ACTIVE    | josephdiaz_fr22                     | joseph.diaz_fr22@proton.me
-  ACTIVE    | emmamitchell_fr23                   | emma.mitchell_fr23@proton.me
-  ACTIVE    | oliviakelly_fr24                    | olivia.kelly_fr24@hotmail.com
-  ACTIVE    | susantaylor_fr25                    | susan.taylor_fr25@icloud.com
-  ACTIVE    | josephrogers_fr26                   | joseph.rogers_fr26@icloud.com
-  ACTIVE    | jamesrogers_fr27                    | james.rogers_fr27@outlook.com
-  ACTIVE    | jameschavez_fr28                    | james.chavez_fr28@icloud.com
-  ACTIVE    | susanroberts_fr29                   | susan.roberts_fr29@icloud.com
+  ACTIVE    | karenwalker_fr0                     | karen.walker_fr0@yahoo.com
+  ACTIVE    | stevenbrown_fr1                     | steven.brown_fr1@yahoo.com
+  ACTIVE    | jenniferramirez_fr2                 | jennifer.ramirez_fr2@proton.me
+  ACTIVE    | nicoleturner_fr3                    | nicole.turner_fr3@icloud.com
+  ACTIVE    | anthonyscott_fr4                    | anthony.scott_fr4@hotmail.com
+  ACTIVE    | avayoung_fr5                        | ava.young_fr5@yahoo.com
+  ACTIVE    | ashleymorgan_fr6                    | ashley.morgan_fr6@gmail.com
+  ACTIVE    | deborahwright_fr7                   | deborah.wright_fr7@hotmail.com
+  ACTIVE    | jenniferlee_fr8                     | jennifer.lee_fr8@hotmail.com
+  ACTIVE    | dianathomas_fr9                     | diana.thomas_fr9@outlook.com
+  ACTIVE    | thomasmorris_fr10                   | thomas.morris_fr10@proton.me
+  ACTIVE    | charlesanderson_fr11                | charles.anderson_fr11@icloud.com
+  SUSPENDED | meganwatson_fr12                    | megan.watson_fr12@icloud.com
+  ACTIVE    | michaelflores_fr13                  | michael.flores_fr13@outlook.com
+  ACTIVE    | avanelson_fr14                      | ava.nelson_fr14@hotmail.com
+  ACTIVE    | maryjohnson_fr15                    | mary.johnson_fr15@icloud.com
+  ACTIVE    | johnharris_fr16                     | john.harris_fr16@proton.me
+  ACTIVE    | sophiaking_fr17                     | sophia.king_fr17@hotmail.com
+  ACTIVE    | alicegreen_fr18                     | alice.green_fr18@hotmail.com
+  ACTIVE    | lindacarter_fr19                    | linda.carter_fr19@hotmail.com
+  ACTIVE    | stephaniemiller_fr20                | stephanie.miller_fr20@hotmail.com
+  ACTIVE    | katherinephillips_fr21              | katherine.phillips_fr21@icloud.com
+  ACTIVE    | oliverreyes_fr22                    | oliver.reyes_fr22@hotmail.com
+  ACTIVE    | charlesturner_fr23                  | charles.turner_fr23@outlook.com
+  ACTIVE    | evelynreed_fr24                     | evelyn.reed_fr24@hotmail.com
+  ACTIVE    | garyward_fr25                       | gary.ward_fr25@hotmail.com
+  ACTIVE    | elijahkelly_fr26                    | elijah.kelly_fr26@hotmail.com
+  ACTIVE    | rachelhoward_fr27                   | rachel.howard_fr27@yahoo.com
+  ACTIVE    | jenniferwhite_fr28                  | jennifer.white_fr28@hotmail.com
+  ACTIVE    | susanmartin_fr29                    | susan.martin_fr29@outlook.com
 
 -- Donees (60) -------------------------------------
-  ACTIVE    | timothyscott_dn0                    | timothy.scott_dn0@proton.me
-  ACTIVE    | liamgreen_dn1                       | liam.green_dn1@hotmail.com
-  ACTIVE    | melissacampbell_dn2                 | melissa.campbell_dn2@outlook.com
-  ACTIVE    | lauralee_dn3                        | laura.lee_dn3@yahoo.com
-  ACTIVE    | loganmorales_dn4                    | logan.morales_dn4@hotmail.com
-  ACTIVE    | ashleycox_dn5                       | ashley.cox_dn5@proton.me
-  ACTIVE    | rebeccaharris_dn6                   | rebecca.harris_dn6@yahoo.com
-  SUSPENDED | joshuasmith_dn7                     | joshua.smith_dn7@yahoo.com
-  ACTIVE    | andrewevans_dn8                     | andrew.evans_dn8@icloud.com
-  ACTIVE    | emilyperez_dn9                      | emily.perez_dn9@proton.me
-  ACTIVE    | evelynsmith_dn10                    | evelyn.smith_dn10@gmail.com
-  SUSPENDED | ronaldadams_dn11                    | ronald.adams_dn11@icloud.com
-  ACTIVE    | brianhall_dn12                      | brian.hall_dn12@hotmail.com
-  ACTIVE    | ryanrogers_dn13                     | ryan.rogers_dn13@icloud.com
-  ACTIVE    | aidenreyes_dn14                     | aiden.reyes_dn14@yahoo.com
-  ACTIVE    | stevenmorris_dn15                   | steven.morris_dn15@proton.me
-  ACTIVE    | kennethmitchell_dn16                | kenneth.mitchell_dn16@outlook.com
-  ACTIVE    | sophiarobinson_dn17                 | sophia.robinson_dn17@outlook.com
-  ACTIVE    | johnjones_dn18                      | john.jones_dn18@yahoo.com
-  ACTIVE    | jennifersanchez_dn19                | jennifer.sanchez_dn19@proton.me
-  ACTIVE    | jeffreyjones_dn20                   | jeffrey.jones_dn20@outlook.com
-  ACTIVE    | katherinecook_dn21                  | katherine.cook_dn21@gmail.com
-  ACTIVE    | joanhoward_dn22                     | joan.howard_dn22@yahoo.com
-  ACTIVE    | williammiller_dn23                  | william.miller_dn23@yahoo.com
-  ACTIVE    | emmamitchell_dn24                   | emma.mitchell_dn24@hotmail.com
-  SUSPENDED | marybaker_dn25                      | mary.baker_dn25@outlook.com
-  ACTIVE    | stephaniecox_dn26                   | stephanie.cox_dn26@gmail.com
-  SUSPENDED | ethanadams_dn27                     | ethan.adams_dn27@yahoo.com
-  ACTIVE    | lindaevans_dn28                     | linda.evans_dn28@outlook.com
-  ACTIVE    | joanward_dn29                       | joan.ward_dn29@proton.me
-  ACTIVE    | donaldparker_dn30                   | donald.parker_dn30@proton.me
-  ACTIVE    | edwardflores_dn31                   | edward.flores_dn31@icloud.com
-  SUSPENDED | christinediaz_dn32                  | christine.diaz_dn32@yahoo.com
-  ACTIVE    | ronaldhall_dn33                     | ronald.hall_dn33@hotmail.com
-  SUSPENDED | danielharris_dn34                   | daniel.harris_dn34@icloud.com
-  ACTIVE    | ethanreyes_dn35                     | ethan.reyes_dn35@proton.me
-  ACTIVE    | stephanielee_dn36                   | stephanie.lee_dn36@icloud.com
-  ACTIVE    | timothyperez_dn37                   | timothy.perez_dn37@proton.me
-  ACTIVE    | danielortiz_dn38                    | daniel.ortiz_dn38@gmail.com
-  ACTIVE    | danielphillips_dn39                 | daniel.phillips_dn39@outlook.com
-  SUSPENDED | ronaldadams_dn40                    | ronald.adams_dn40@yahoo.com
-  ACTIVE    | jeffreyreyes_dn41                   | jeffrey.reyes_dn41@outlook.com
-  ACTIVE    | sophiamorales_dn42                  | sophia.morales_dn42@icloud.com
-  ACTIVE    | kennethjackson_dn43                 | kenneth.jackson_dn43@icloud.com
-  ACTIVE    | harperjohnson_dn44                  | harper.johnson_dn44@icloud.com
-  ACTIVE    | anthonyallen_dn45                   | anthony.allen_dn45@proton.me
-  ACTIVE    | karenreyes_dn46                     | karen.reyes_dn46@proton.me
-  ACTIVE    | harperlewis_dn47                    | harper.lewis_dn47@yahoo.com
-  ACTIVE    | harperking_dn48                     | harper.king_dn48@outlook.com
-  ACTIVE    | danielmartinez_dn49                 | daniel.martinez_dn49@icloud.com
-  SUSPENDED | sarahclark_dn50                     | sarah.clark_dn50@proton.me
-  ACTIVE    | joanwright_dn51                     | joan.wright_dn51@proton.me
-  ACTIVE    | richardturner_dn52                  | richard.turner_dn52@gmail.com
-  ACTIVE    | carterthomas_dn53                   | carter.thomas_dn53@hotmail.com
-  ACTIVE    | miajohnson_dn54                     | mia.johnson_dn54@gmail.com
-  ACTIVE    | avaadams_dn55                       | ava.adams_dn55@gmail.com
-  SUSPENDED | patriciasanchez_dn56                | patricia.sanchez_dn56@hotmail.com
-  ACTIVE    | rachelcooper_dn57                   | rachel.cooper_dn57@proton.me
-  ACTIVE    | masoncook_dn58                      | mason.cook_dn58@yahoo.com
-  ACTIVE    | emilykelly_dn59                     | emily.kelly_dn59@outlook.com
+  ACTIVE    | miaevans_dn0                        | mia.evans_dn0@hotmail.com
+  ACTIVE    | garygutierrez_dn1                   | gary.gutierrez_dn1@outlook.com
+  SUSPENDED | ashleymartinez_dn2                  | ashley.martinez_dn2@gmail.com
+  ACTIVE    | richardtaylor_dn3                   | richard.taylor_dn3@proton.me
+  ACTIVE    | loganyoung_dn4                      | logan.young_dn4@outlook.com
+  SUSPENDED | rachelcox_dn5                       | rachel.cox_dn5@icloud.com
+  ACTIVE    | karencook_dn6                       | karen.cook_dn6@yahoo.com
+  SUSPENDED | susanramos_dn7                      | susan.ramos_dn7@hotmail.com
+  ACTIVE    | robertmurphy_dn8                    | robert.murphy_dn8@hotmail.com
+  ACTIVE    | susangarcia_dn9                     | susan.garcia_dn9@yahoo.com
+  ACTIVE    | katherinerivera_dn10                | katherine.rivera_dn10@gmail.com
+  ACTIVE    | johncox_dn11                        | john.cox_dn11@outlook.com
+  ACTIVE    | jamesjackson_dn12                   | james.jackson_dn12@icloud.com
+  ACTIVE    | hannahharris_dn13                   | hannah.harris_dn13@yahoo.com
+  ACTIVE    | jeffreywalker_dn14                  | jeffrey.walker_dn14@hotmail.com
+  ACTIVE    | samantharivera_dn15                 | samantha.rivera_dn15@outlook.com
+  ACTIVE    | donaldturner_dn16                   | donald.turner_dn16@hotmail.com
+  SUSPENDED | brianrogers_dn17                    | brian.rogers_dn17@proton.me
+  ACTIVE    | kevintorres_dn18                    | kevin.torres_dn18@icloud.com
+  ACTIVE    | rebeccamorgan_dn19                  | rebecca.morgan_dn19@outlook.com
+  SUSPENDED | josephbaker_dn20                    | joseph.baker_dn20@icloud.com
+  ACTIVE    | richardcarter_dn21                  | richard.carter_dn21@yahoo.com
+  ACTIVE    | stephanieramirez_dn22               | stephanie.ramirez_dn22@outlook.com
+  ACTIVE    | ronaldking_dn23                     | ronald.king_dn23@outlook.com
+  ACTIVE    | patriciasmith_dn24                  | patricia.smith_dn24@proton.me
+  ACTIVE    | laurapeterson_dn25                  | laura.peterson_dn25@gmail.com
+  ACTIVE    | elijahpeterson_dn26                 | elijah.peterson_dn26@outlook.com
+  ACTIVE    | brianyoung_dn27                     | brian.young_dn27@yahoo.com
+  ACTIVE    | richardmoore_dn28                   | richard.moore_dn28@proton.me
+  ACTIVE    | jasonmiller_dn29                    | jason.miller_dn29@icloud.com
+  SUSPENDED | danielwhite_dn30                    | daniel.white_dn30@icloud.com
+  ACTIVE    | georgecampbell_dn31                 | george.campbell_dn31@yahoo.com
+  ACTIVE    | masonchavez_dn32                    | mason.chavez_dn32@proton.me
+  ACTIVE    | brianyoung_dn33                     | brian.young_dn33@yahoo.com
+  ACTIVE    | richardmartin_dn34                  | richard.martin_dn34@icloud.com
+  ACTIVE    | sophiamiller_dn35                   | sophia.miller_dn35@gmail.com
+  SUSPENDED | ameliaphillips_dn36                 | amelia.phillips_dn36@outlook.com
+  ACTIVE    | laurarogers_dn37                    | laura.rogers_dn37@icloud.com
+  ACTIVE    | liamstewart_dn38                    | liam.stewart_dn38@hotmail.com
+  ACTIVE    | donaldhoward_dn39                   | donald.howard_dn39@icloud.com
+  ACTIVE    | melissahall_dn40                    | melissa.hall_dn40@gmail.com
+  ACTIVE    | andrewnelson_dn41                   | andrew.nelson_dn41@outlook.com
+  ACTIVE    | rebeccaward_dn42                    | rebecca.ward_dn42@icloud.com
+  ACTIVE    | deborahdavis_dn43                   | deborah.davis_dn43@hotmail.com
+  ACTIVE    | ronaldscott_dn44                    | ronald.scott_dn44@icloud.com
+  SUSPENDED | jasonlewis_dn45                     | jason.lewis_dn45@icloud.com
+  ACTIVE    | emmahoward_dn46                     | emma.howard_dn46@gmail.com
+  ACTIVE    | joanmitchell_dn47                   | joan.mitchell_dn47@hotmail.com
+  ACTIVE    | harperwatson_dn48                   | harper.watson_dn48@outlook.com
+  ACTIVE    | davidmartin_dn49                    | david.martin_dn49@yahoo.com
+  ACTIVE    | susanhall_dn50                      | susan.hall_dn50@hotmail.com
+  ACTIVE    | ameliaparker_dn51                   | amelia.parker_dn51@outlook.com
+  ACTIVE    | edwardmoore_dn52                    | edward.moore_dn52@icloud.com
+  ACTIVE    | elijahcooper_dn53                   | elijah.cooper_dn53@gmail.com
+  ACTIVE    | josephcruz_dn54                     | joseph.cruz_dn54@outlook.com
+  ACTIVE    | noahwright_dn55                     | noah.wright_dn55@proton.me
+  ACTIVE    | nicolegutierrez_dn56                | nicole.gutierrez_dn56@gmail.com
+  ACTIVE    | jamesreyes_dn57                     | james.reyes_dn57@yahoo.com
+  ACTIVE    | lindagomez_dn58                     | linda.gomez_dn58@hotmail.com
+  ACTIVE    | meganmorales_dn59                   | megan.morales_dn59@outlook.com
 
 -- Platform Managers (10) ------------------------------
-  ACTIVE    | noahparker_pm0                      | noah.parker_pm0@proton.me
-  ACTIVE    | jenniferwilson_pm1                  | jennifer.wilson_pm1@gmail.com
-  ACTIVE    | liamnelson_pm2                      | liam.nelson_pm2@proton.me
-  ACTIVE    | ronaldmiller_pm3                    | ronald.miller_pm3@gmail.com
-  ACTIVE    | lauraperez_pm4                      | laura.perez_pm4@icloud.com
-  ACTIVE    | anthonynguyen_pm5                   | anthony.nguyen_pm5@hotmail.com
-  ACTIVE    | jessicayoung_pm6                    | jessica.young_pm6@icloud.com
-  SUSPENDED | marywilson_pm7                      | mary.wilson_pm7@hotmail.com
-  ACTIVE    | sarahlee_pm8                        | sarah.lee_pm8@gmail.com
-  SUSPENDED | karenanderson_pm9                   | karen.anderson_pm9@proton.me
+  ACTIVE    | miamartin_pm0                       | mia.martin_pm0@yahoo.com
+  ACTIVE    | liambrooks_pm1                      | liam.brooks_pm1@proton.me
+  ACTIVE    | kennethmiller_pm2                   | kenneth.miller_pm2@outlook.com
+  ACTIVE    | noahcook_pm3                        | noah.cook_pm3@gmail.com
+  ACTIVE    | liamcampbell_pm4                    | liam.campbell_pm4@outlook.com
+  ACTIVE    | melissathomas_pm5                   | melissa.thomas_pm5@outlook.com
+  ACTIVE    | meganmitchell_pm6                   | megan.mitchell_pm6@gmail.com
+  ACTIVE    | alicewright_pm7                     | alice.wright_pm7@gmail.com
+  ACTIVE    | stevencox_pm8                       | steven.cox_pm8@icloud.com
+  ACTIVE    | davidbrooks_pm9                     | david.brooks_pm9@icloud.com
 
 -- Summary -------------------------------------------
   User Profiles  : 4
@@ -128,6 +128,6 @@ Password  : Abc.1234 (all users)
     -> Fundraiser : 30
     -> Donee      : 60
     -> PM         : 10
-  FRA            : 152  (106 active, 37 completed, 9 suspended)
-  Donations      : 258
-  Favourites     : 239
+  FRA            : 149  (103 active, 30 completed, 16 suspended)
+  Donations      : 262
+  Favourites     : 245

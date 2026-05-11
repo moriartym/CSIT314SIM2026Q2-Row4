@@ -83,10 +83,14 @@ class FundraisingActivityRepository {
     return result
   }
 
-  async findAllByUser(userId, limit = 5, skip = 0, category = '') {
+  async findAllByUser(userId, limit = 5, skip = 0, category = '', status = '') {
     const match = { createdBy: new mongoose.Types.ObjectId(userId) }
     if (category && mongoose.Types.ObjectId.isValid(category)) {
       match.category = new mongoose.Types.ObjectId(category)
+    }
+    if (status) {
+      const statuses = status.split(',').map(s => s.trim()).filter(Boolean)
+      match.status = statuses.length === 1 ? statuses[0] : { $in: statuses }
     }
     const [fras, total] = await Promise.all([
       FundraisingActivity.find(match)
@@ -115,7 +119,7 @@ class FundraisingActivityRepository {
     return this._attachProgress(fras)
   }
 
-  async searchByUser(userId, query, limit = 5, skip = 0, category = '') {
+  async searchByUser(userId, query, limit = 5, skip = 0, category = '', status = '') {
     if (!query || !query.trim()) throw new Error('Search query is required')
     const match = {
       createdBy: new mongoose.Types.ObjectId(userId),
@@ -124,6 +128,7 @@ class FundraisingActivityRepository {
     if (category && mongoose.Types.ObjectId.isValid(category)) {
       match.category = new mongoose.Types.ObjectId(category)
     }
+    if (status) match.status = status
     const [fras, total] = await Promise.all([
       FundraisingActivity.find(match)
         .select('title status targetAmount category viewCount shortlistCount')

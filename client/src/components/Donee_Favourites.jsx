@@ -10,14 +10,14 @@ function StatusBadge({ status }) {
 }
 
 function FavouriteList({ onView }) {
-  const [favourites, setFavourites] = useState([])
-  const [loading, setLoading]       = useState(false)
+  const [favourites, setFavourites]   = useState([])
+  const [loading, setLoading]         = useState(false)
   const [loadingMore, setLoadingMore] = useState(false)
-  const [error, setError]           = useState(null)
-  const [search, setSearch]         = useState('')
-  const [favLoading, setFavLoading] = useState(new Set())
-  const [skip, setSkip]             = useState(0)
-  const [total, setTotal]           = useState(0)
+  const [error, setError]             = useState(null)
+  const [search, setSearch]           = useState('')
+  const [favLoading, setFavLoading]   = useState(new Set())
+  const [skip, setSkip]               = useState(0)
+  const [total, setTotal]             = useState(0)
 
   const fetchList = async (currentSkip = 0, append = false) => {
     append ? setLoadingMore(true) : setLoading(true)
@@ -45,8 +45,7 @@ function FavouriteList({ onView }) {
       const res  = await fetch(`${FAV_API}/search?${params.toString()}`, { credentials: 'include' })
       const data = await res.json()
       if (data.success) {
-        const filtered = data.data.filter(fav => fav.fra?.status === 'active')
-        setFavourites(prev => append ? [...prev, ...filtered] : filtered)
+        setFavourites(prev => append ? [...prev, ...data.data] : data.data)
         setTotal(data.total)
         setSkip(currentSkip)
       } else {
@@ -78,8 +77,9 @@ function FavouriteList({ onView }) {
       const res  = await fetch(`${FAV_API}/${fraId}`, { method: 'DELETE', credentials: 'include' })
       const data = await res.json()
       if (data.success) {
-        setFavourites(prev => prev.filter(f => f._id !== favId))
-        setTotal(prev => prev - 1)
+        setSkip(0)
+        if (search.trim()) fetchSearch(search.trim(), 0)
+        else fetchList(0)
       }
     } catch {}
     finally { setFavLoading(prev => { const next = new Set(prev); next.delete(favId); return next }) }
@@ -150,7 +150,7 @@ function FavouriteList({ onView }) {
 }
 
 export default function Favourites() {
-  const [page, setPage]         = useState('list')
+  const [page, setPage]     = useState('list')
   const [selected, setSelected] = useState(null)
 
   return (

@@ -10,10 +10,13 @@ function StatusBadge({ status }) {
 }
 
 export default function SearchFRA({ onNavigate }) {
+  const [tab, setTab]                 = useState('active')
   const [categories, setCategories]   = useState([])
   const [fras, setFras]               = useState([])
   const [query, setQuery]             = useState('')
   const [filterCat, setFilterCat]     = useState('')
+  const [from, setFrom]               = useState('')
+  const [to, setTo]                   = useState('')
   const [loading, setLoading]         = useState(false)
   const [loadingMore, setLoadingMore] = useState(false)
   const [skip, setSkip]               = useState(0)
@@ -24,21 +27,37 @@ export default function SearchFRA({ onNavigate }) {
       .then(r => r.json())
       .then(d => { if (d.success) setCategories((d.data || []).filter(c => c.isActive)) })
       .catch(() => {})
-
-    fetchList('', 0)
   }, [])
 
-  const fetchList = async (cat, currentSkip = 0, append = false) => {
+  useEffect(() => {
+    setQuery(''); setFilterCat(''); setFrom(''); setTo(''); setSkip(0); fetchList('', 0)
+  }, [tab])
+
+  const fetchList = async (cat, currentSkip = 0, append = false, fromDate = '', toDate = '') => {
     append ? setLoadingMore(true) : setLoading(true)
     try {
-      const params = new URLSearchParams({ limit: PAGE_SIZE, skip: currentSkip })
-      if (cat) params.set('category', cat)
-      const res  = await fetch(`${API}/mine?${params.toString()}`, { credentials: 'include' })
-      const data = await res.json()
-      if (data.success) {
-        setFras(prev => append ? [...prev, ...data.data] : data.data)
-        setTotal(data.total)
-        setSkip(currentSkip)
+      if (tab === 'completed') {
+        const p = new URLSearchParams()
+        if (cat)      p.set('category', cat)
+        if (fromDate) p.set('from', fromDate)
+        if (toDate)   p.set('to', toDate)
+        const res  = await fetch(`${API}/completed?${p.toString()}`, { credentials: 'include' })
+        const data = await res.json()
+        if (data.success) {
+          setFras(data.data)
+          setTotal(data.data.length)
+          setSkip(0)
+        }
+      } else {
+        const params = new URLSearchParams({ limit: PAGE_SIZE, skip: currentSkip, status: 'active,suspended' })
+        if (cat) params.set('category', cat)
+        const res  = await fetch(`${API}/mine?${params.toString()}`, { credentials: 'include' })
+        const data = await res.json()
+        if (data.success) {
+          setFras(prev => append ? [...prev, ...data.data] : data.data)
+          setTotal(data.total)
+          setSkip(currentSkip)
+        }
       }
     } catch {}
     finally { append ? setLoadingMore(false) : setLoading(false) }
@@ -47,14 +66,27 @@ export default function SearchFRA({ onNavigate }) {
   const fetchSearch = async (q, cat, currentSkip = 0, append = false) => {
     append ? setLoadingMore(true) : setLoading(true)
     try {
-      const params = new URLSearchParams({ query: q, limit: PAGE_SIZE, skip: currentSkip })
-      if (cat) params.set('category', cat)
-      const res  = await fetch(`${API}/search?${params.toString()}`, { credentials: 'include' })
-      const data = await res.json()
-      if (data.success) {
-        setFras(prev => append ? [...prev, ...data.data] : data.data)
-        setTotal(data.total)
-        setSkip(currentSkip)
+      if (tab === 'completed') {
+        const params = new URLSearchParams({ query: q, limit: PAGE_SIZE, skip: currentSkip, status: 'completed' })
+        if (cat) params.set('category', cat)
+        const res  = await fetch(`${API}/search?${params.toString()}`, { credentials: 'include' })
+        const data = await res.json()
+        if (data.success) {
+          setFras(prev => append ? [...prev, ...data.data] : data.data)
+          setTotal(data.total)
+          setSkip(currentSkip)
+        }
+      } else {
+        const params = new URLSearchParams({ query: q, limit: PAGE_SIZE, skip: currentSkip })
+        if (cat) params.set('category', cat)
+        const res  = await fetch(`${API}/search?${params.toString()}`, { credentials: 'include' })
+        const data = await res.json()
+        if (data.success) {
+          const filtered = data.data.filter(f => f.status !== 'completed')
+          setFras(prev => append ? [...prev, ...filtered] : filtered)
+          setTotal(data.total)
+          setSkip(currentSkip)
+        }
       }
     } catch {}
     finally { append ? setLoadingMore(false) : setLoading(false) }
@@ -62,24 +94,20 @@ export default function SearchFRA({ onNavigate }) {
 
   const handleSearch = () => {
     setSkip(0)
-    if (query.trim()) fetchSearch(query.trim(), filterCat)
-    else fetchList(filterCat)
-  }
-
-  const handleCatChange = (e) => {
-    setFilterCat(e.target.value)
+    if (query.trim()) fetchSearch(query.trim(), filterCat, 0)
+    else fetchList(filterCat, 0, false, from, to)
   }
 
   const handleLoadMore = () => {
     const nextSkip = skip + PAGE_SIZE
     if (query.trim()) fetchSearch(query.trim(), filterCat, nextSkip, true)
-    else fetchList(filterCat, nextSkip, true)
+    else fetchList(filterCat, nextSkip, true, from, to)
   }
 
   const refreshList = () => {
     setSkip(0)
-    if (query.trim()) fetchSearch(query.trim(), filterCat)
-    else fetchList(filterCat)
+    if (query.trim()) fetchSearch(query.trim(), filterCat, 0)
+    else fetchList(filterCat, 0, false, from, to)
   }
 
   const suspend = async (id) => {
@@ -98,9 +126,14 @@ export default function SearchFRA({ onNavigate }) {
 
   return (
     <div className="ua-card">
+      <div className="ua-tabs" style={{ marginBottom: '1rem' }}>
+        <button className={`ua-tab ${tab === 'active'    ? 'ua-tab-active' : ''}`} onClick={() => setTab('active')}>Active</button>
+        <button className={`ua-tab ${tab === 'completed' ? 'ua-tab-active' : ''}`} onClick={() => setTab('completed')}>Completed</button>
+      </div>
+
       <div className="ua-card-header">
-        <span className="ua-card-title">My Campaigns</span>
-        <button className="ua-btn ua-btn-sm" onClick={() => onNavigate('create')}>+ Create</button>
+        <span className="ua-card-title">{tab === 'active' ? 'My Campaigns' : 'Completed Campaigns'}</span>
+        {tab === 'active' && <button className="ua-btn ua-btn-sm" onClick={() => onNavigate('create')}>+ Create</button>}
       </div>
 
       <div style={{ display: 'flex', gap: '8px', marginBottom: '0.5rem', flexWrap: 'wrap' }}>
@@ -116,13 +149,21 @@ export default function SearchFRA({ onNavigate }) {
           className="ua-input"
           style={{ flex: 1, minWidth: '130px' }}
           value={filterCat}
-          onChange={handleCatChange}
+          onChange={e => setFilterCat(e.target.value)}
         >
           <option value="">All categories</option>
           {categories.map(c => <option key={c._id} value={c._id}>{c.name}</option>)}
         </select>
         <button className="ua-btn ua-btn-sm" onClick={handleSearch}>Search</button>
       </div>
+
+      {tab === 'completed' && (
+        <div style={{ display: 'flex', gap: '8px', marginBottom: '0.75rem', flexWrap: 'wrap' }}>
+          <input className="ua-input" type="date" style={{ flex: 1, minWidth: '130px' }} value={from} onChange={e => setFrom(e.target.value)} />
+          <input className="ua-input" type="date" style={{ flex: 1, minWidth: '130px' }} value={to}   onChange={e => setTo(e.target.value)} />
+          <button className="ua-btn ua-btn-sm" onClick={() => { setSkip(0); fetchList(filterCat, 0, false, from, to) }}>Filter</button>
+        </div>
+      )}
 
       {loading && <p className="ua-muted">Loading…</p>}
       {!loading && fras.length === 0 && <p className="ua-muted">No campaigns found</p>}
@@ -136,20 +177,23 @@ export default function SearchFRA({ onNavigate }) {
             <div className="ua-row-body" style={{ flex: 1, minWidth: 0 }}>
               <p className="ua-row-name">{fra.title}</p>
               <p className="ua-row-desc">{fra.category?.name || '-'} · ${fra.targetAmount?.toLocaleString()}</p>
+              {tab === 'completed' && fra.completedAt && (
+                <p className="ua-row-desc">Completed: {new Date(fra.completedAt).toLocaleDateString()}</p>
+              )}
             </div>
             <StatusBadge status={fra.status} />
-            {fra.status !== 'completed' && (
+            {tab === 'active' && fra.status !== 'completed' && (
               <button className="ua-btn-ghost" style={{ fontSize: '0.72rem' }} onClick={() => suspend(fra._id)}>
                 {fra.status === 'active' ? 'Suspend' : 'Activate'}
               </button>
             )}
-            {fra.status === 'active' && (
+            {tab === 'active' && fra.status === 'active' && (
               <button className="ua-btn-ghost" style={{ fontSize: '0.72rem', color: '#64a0ff', borderColor: '#64a0ff' }} onClick={() => complete(fra._id)}>
                 Complete
               </button>
             )}
             <button className="ua-btn ua-btn-sm" onClick={() => onNavigate('view', fra._id)}>View</button>
-            {fra.status !== 'completed' && (
+            {tab === 'active' && fra.status !== 'completed' && (
               <button className="ua-btn ua-btn-sm" onClick={() => onNavigate('update', fra._id)}>Update</button>
             )}
           </div>
