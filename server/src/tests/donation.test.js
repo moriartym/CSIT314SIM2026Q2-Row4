@@ -94,23 +94,23 @@ afterAll(async () => {
 }, 30000)
 
 describe('TC-31: Search Donation History', () => {
-  it('TC31-1: should return all donation history for the donee', async () => {
-    const res = await doneeAgent.get('/api/fra/donations')
+  it('TC31-1: should return matching donation history for the donee', async () => {
+    const res = await doneeAgent.get('/api/fra/donations/search?query=Test FRA for Donations')
     expect(res.status).toBe(200)
     expect(res.body.success).toBe(true)
     expect(Array.isArray(res.body.data)).toBe(true)
     expect(res.body.data.length).toBeGreaterThan(0)
   })
 
-  it('TC31-2: should filter by category', async () => {
-    const res = await doneeAgent.get(`/api/fra/donations?category=${healthCategoryId}`)
+  it('TC31-2: should filter by category with search query', async () => {
+    const res = await doneeAgent.get(`/api/fra/donations/search?query=Test FRA for Donations&category=${healthCategoryId}`)
     expect(res.status).toBe(200)
     expect(res.body.success).toBe(true)
     expect(res.body.data.length).toBeGreaterThan(0)
   })
 
-  it('TC31-3: should filter by date range', async () => {
-    const res = await doneeAgent.get('/api/fra/donations?from=2024-01-01&to=2024-12-31')
+  it('TC31-3: should filter by date range with search query', async () => {
+    const res = await doneeAgent.get('/api/fra/donations/search?query=Test FRA for Donations&from=2024-01-01&to=2024-12-31')
     expect(res.status).toBe(200)
     expect(res.body.success).toBe(true)
     expect(res.body.data.length).toBeGreaterThan(0)
@@ -118,14 +118,14 @@ describe('TC-31: Search Donation History', () => {
 
   it('TC31-4: should return empty array for non-matching category', async () => {
     const fakeId = new mongoose.Types.ObjectId().toString()
-    const res = await doneeAgent.get(`/api/fra/donations?category=${fakeId}`)
+    const res = await doneeAgent.get(`/api/fra/donations/search?query=Test FRA for Donations&category=${fakeId}`)
     expect(res.status).toBe(200)
     expect(res.body.success).toBe(true)
     expect(res.body.data.length).toBe(0)
   })
 
   it('TC31-5: should fail when not authenticated', async () => {
-    const res = await request(app).get('/api/fra/donations')
+    const res = await request(app).get('/api/fra/donations/search?query=Test FRA for Donations')
     expect(res.status).toBe(401)
     expect(res.body.success).toBe(false)
   })

@@ -153,11 +153,9 @@ Entity    →  models / repositories
 | Controller | Story |
 | --- | --- |
 | `createFRAController.js` | 13 |
-| `listMyFRAController.js` | Additional - no story |
 | `updateFRAController.js` | 15 |
 | `suspendFRAController.js` | 16 |
 | `markCompleteFRAController.js` | Additional - no story |
-| `listAllFRAController.js.js` | Additional - no story |
 | `viewMyCompletedFRAController.js` | 30 |
 | `searchFRAController.js` | 17, 20 |
 | `viewFRAController.js` | 21, 32, 14 |
@@ -172,14 +170,13 @@ Entity    →  models / repositories
 | `viewFavouriteController.js` | 23 |
 | `searchFavouriteController.js` | 24 |
 | `removeFavouriteController.js` | Additional - no story |
-| `listFavouriteController.js.js` | Additional - no story |
+| `listFavouriteController.js` | Additional - track favorite on browse |
 
 ### 💳 donation
 
 | Controller | Story |
 | --- | --- |
 | `createDonationController.js` | Additional - no story |
-| `listDonationHistoryController.js.js` | Additional - no story |
 | `searchDonationHistoryController.js` | 31 |
 
 ### 🗂️ fraCategory

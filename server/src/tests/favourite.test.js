@@ -92,11 +92,11 @@ describe('TC-22: Save FRA to Favourites', () => {
     expect(res.body.message).toBe('FRA saved to favourites')
   })
 
-  it('TC22-2: should fail when FRA is already in favourites', async () => {
+  it('TC22-2: should succeed idempotently when FRA is already in favourites', async () => {
     const res = await doneeAgent.post(`/api/favourites/${fraId}`)
-    expect(res.status).toBe(400)
-    expect(res.body.success).toBe(false)
-    expect(res.body.message).toBe('FRA already in favourites')
+    expect(res.status).toBe(201)
+    expect(res.body.success).toBe(true)
+    expect(res.body.message).toBe('FRA saved to favourites')
   })
 
   it('TC22-3: should fail for invalid FRA ID', async () => {

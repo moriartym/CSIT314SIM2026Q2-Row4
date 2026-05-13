@@ -147,8 +147,8 @@ describe('TC-13: Create FRA', () => {
 })
 
 describe('TC-14: View my FRA', () => {
-  it('TC14-1: should return all FRAs for the logged in FR', async () => {
-    const res = await agent.get('/api/fra/mine')
+  it('TC14-1: should return matching FRAs for the logged in FR via search', async () => {
+    const res = await agent.get('/api/fra/search?query=Help Build a School')
 
     expect(res.status).toBe(200)
     expect(res.body.success).toBe(true)

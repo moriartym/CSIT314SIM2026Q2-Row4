@@ -21,6 +21,7 @@ export default function SearchFRA({ onNavigate }) {
   const [loadingMore, setLoadingMore] = useState(false)
   const [skip, setSkip]               = useState(0)
   const [total, setTotal]             = useState(0)
+  const [searched, setSearched]       = useState(false)
 
   useEffect(() => {
     fetch(`${CAT_API}/all`, { credentials: 'include' })
@@ -30,34 +31,24 @@ export default function SearchFRA({ onNavigate }) {
   }, [])
 
   useEffect(() => {
-    setQuery(''); setFilterCat(''); setFrom(''); setTo(''); setSkip(0); fetchList('', 0)
+    setQuery(''); setFilterCat(''); setFrom(''); setTo(''); setSkip(0)
+    setFras([]); setTotal(0); setSearched(false)
   }, [tab])
 
-  const fetchList = async (cat, currentSkip = 0, append = false, fromDate = '', toDate = '') => {
+  const fetchCompleted = async (cat, currentSkip = 0, append = false, fromDate = '', toDate = '') => {
     append ? setLoadingMore(true) : setLoading(true)
     try {
-      if (tab === 'completed') {
-        const p = new URLSearchParams()
-        if (cat)      p.set('category', cat)
-        if (fromDate) p.set('from', fromDate)
-        if (toDate)   p.set('to', toDate)
-        const res  = await fetch(`${API}/completed?${p.toString()}`, { credentials: 'include' })
-        const data = await res.json()
-        if (data.success) {
-          setFras(data.data)
-          setTotal(data.data.length)
-          setSkip(0)
-        }
-      } else {
-        const params = new URLSearchParams({ limit: PAGE_SIZE, skip: currentSkip, status: 'active,suspended' })
-        if (cat) params.set('category', cat)
-        const res  = await fetch(`${API}/mine?${params.toString()}`, { credentials: 'include' })
-        const data = await res.json()
-        if (data.success) {
-          setFras(prev => append ? [...prev, ...data.data] : data.data)
-          setTotal(data.total)
-          setSkip(currentSkip)
-        }
+      const p = new URLSearchParams()
+      if (cat)      p.set('category', cat)
+      if (fromDate) p.set('from', fromDate)
+      if (toDate)   p.set('to', toDate)
+      const res  = await fetch(`${API}/completed?${p.toString()}`, { credentials: 'include' })
+      const data = await res.json()
+      if (data.success) {
+        setFras(data.data)
+        setTotal(data.data.length)
+        setSkip(0)
+        setSearched(true)
       }
     } catch {}
     finally { append ? setLoadingMore(false) : setLoading(false) }
@@ -75,6 +66,7 @@ export default function SearchFRA({ onNavigate }) {
           setFras(prev => append ? [...prev, ...data.data] : data.data)
           setTotal(data.total)
           setSkip(currentSkip)
+          setSearched(true)
         }
       } else {
         const params = new URLSearchParams({ query: q, limit: PAGE_SIZE, skip: currentSkip })
@@ -86,6 +78,7 @@ export default function SearchFRA({ onNavigate }) {
           setFras(prev => append ? [...prev, ...filtered] : filtered)
           setTotal(data.total)
           setSkip(currentSkip)
+          setSearched(true)
         }
       }
     } catch {}
@@ -94,20 +87,23 @@ export default function SearchFRA({ onNavigate }) {
 
   const handleSearch = () => {
     setSkip(0)
-    if (query.trim()) fetchSearch(query.trim(), filterCat, 0)
-    else fetchList(filterCat, 0, false, from, to)
+    if (query.trim()) {
+      fetchSearch(query.trim(), filterCat, 0)
+    } else if (tab === 'completed') {
+      fetchCompleted(filterCat, 0, false, from, to)
+    }
   }
 
   const handleLoadMore = () => {
     const nextSkip = skip + PAGE_SIZE
     if (query.trim()) fetchSearch(query.trim(), filterCat, nextSkip, true)
-    else fetchList(filterCat, nextSkip, true, from, to)
+    else if (tab === 'completed') fetchCompleted(filterCat, nextSkip, true, from, to)
   }
 
   const refreshList = () => {
     setSkip(0)
     if (query.trim()) fetchSearch(query.trim(), filterCat, 0)
-    else fetchList(filterCat, 0, false, from, to)
+    else if (tab === 'completed') fetchCompleted(filterCat, 0, false, from, to)
   }
 
   const suspend = async (id) => {
@@ -161,12 +157,15 @@ export default function SearchFRA({ onNavigate }) {
         <div style={{ display: 'flex', gap: '8px', marginBottom: '0.75rem', flexWrap: 'wrap' }}>
           <input className="ua-input" type="date" style={{ flex: 1, minWidth: '130px' }} value={from} onChange={e => setFrom(e.target.value)} />
           <input className="ua-input" type="date" style={{ flex: 1, minWidth: '130px' }} value={to}   onChange={e => setTo(e.target.value)} />
-          <button className="ua-btn ua-btn-sm" onClick={() => { setSkip(0); fetchList(filterCat, 0, false, from, to) }}>Filter</button>
+          <button className="ua-btn ua-btn-sm" onClick={() => { setSkip(0); fetchCompleted(filterCat, 0, false, from, to) }}>Filter</button>
         </div>
       )}
 
       {loading && <p className="ua-muted">Loading…</p>}
-      {!loading && fras.length === 0 && <p className="ua-muted">No campaigns found</p>}
+      {!loading && !searched && <p className="ua-muted">
+        {tab === 'active' ? 'Enter a search term to find your campaigns.' : 'Search or use the date filter to view completed campaigns.'}
+      </p>}
+      {!loading && searched && fras.length === 0 && <p className="ua-muted">No campaigns found.</p>}
 
       <div className="ua-list">
         {fras.map(fra => (

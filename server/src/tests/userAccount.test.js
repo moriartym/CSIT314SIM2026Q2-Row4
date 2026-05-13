@@ -141,6 +141,37 @@ describe('User Account API', () => {
       expect(res.body.success).toBe(false)
       expect(res.body.message).toBe('User account was not found')
     })
+
+    it('TC08-3: should fail to update after the user has been deleted', async () => {
+      const createRes = await agent
+        .post('/api/users-account')
+        .send({
+          username: 'testuser01',
+          email: 'test01@gmail.com',
+          password: 'Abc.1234',
+          userProfile: userProfileId
+        })
+      expect(createRes.status).toBe(201)
+      const tempId = createRes.body.data._id
+
+      const verifyRes = await agent.get(`/api/users-account/${tempId}`)
+      expect(verifyRes.status).toBe(200)
+      expect(verifyRes.body.data._id).toBe(tempId)
+
+      await UserAccount.findByIdAndDelete(tempId)
+
+      const res = await agent
+        .put(`/api/users-account/${tempId}`)
+        .send({
+          username: 'testuser01updated',
+          email: 'test01@gmail.com',
+          userProfile: userProfileId
+        })
+
+      expect(res.status).toBe(404)
+      expect(res.body.success).toBe(false)
+      expect(res.body.message).toBe('User account was not found')
+    })
   })
 
   describe('TC-09: Suspend user account', () => {

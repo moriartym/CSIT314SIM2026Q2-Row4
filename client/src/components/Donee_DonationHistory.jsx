@@ -20,6 +20,7 @@ function DonationList({ onView }) {
   const [search, setSearch]             = useState('')
   const [skip, setSkip]                 = useState(0)
   const [total, setTotal]               = useState(0)
+  const [searched, setSearched]         = useState(false)
 
   useEffect(() => {
     fetch(`${CAT_API}/all`, { credentials: 'include' })
@@ -27,27 +28,6 @@ function DonationList({ onView }) {
       .then(d => { if (d.success) setCategories((d.data || []).filter(c => c.isActive)) })
       .catch(() => {})
   }, [])
-
-  const fetchList = async (currentFilters, currentSkip = 0, append = false) => {
-    append ? setLoadingMore(true) : setLoading(true)
-    setError(null)
-    try {
-      const params = new URLSearchParams({ limit: PAGE_SIZE, skip: currentSkip })
-      if (currentFilters.category) params.set('category', currentFilters.category)
-      if (currentFilters.from)     params.set('from', currentFilters.from)
-      if (currentFilters.to)       params.set('to', currentFilters.to)
-      const res  = await fetch(`${API}/donations?${params.toString()}`, { credentials: 'include' })
-      const data = await res.json()
-      if (data.success) {
-        setDonations(prev => append ? [...prev, ...data.data] : data.data)
-        setTotal(data.total)
-        setSkip(currentSkip)
-      } else {
-        setError(data.message)
-      }
-    } catch { setError('Error connecting to server') }
-    finally { append ? setLoadingMore(false) : setLoading(false) }
-  }
 
   const fetchSearch = async (currentFilters, query, currentSkip = 0, append = false) => {
     append ? setLoadingMore(true) : setLoading(true)
@@ -63,6 +43,7 @@ function DonationList({ onView }) {
         setDonations(prev => append ? [...prev, ...data.data] : data.data)
         setTotal(data.total)
         setSkip(currentSkip)
+        setSearched(true)
       } else {
         setError(data.message)
       }
@@ -70,20 +51,17 @@ function DonationList({ onView }) {
     finally { append ? setLoadingMore(false) : setLoading(false) }
   }
 
-  useEffect(() => { fetchList(filters) }, [])
-
   const handleFilterChange = (e) => setFilters(prev => ({ ...prev, [e.target.name]: e.target.value }))
 
   const handleSearch = () => {
+    if (!search.trim()) return
     setSkip(0)
-    if (search.trim()) fetchSearch(filters, search.trim())
-    else fetchList(filters)
+    fetchSearch(filters, search.trim())
   }
 
   const handleLoadMore = () => {
     const nextSkip = skip + PAGE_SIZE
-    if (search.trim()) fetchSearch(filters, search.trim(), nextSkip, true)
-    else fetchList(filters, nextSkip, true)
+    fetchSearch(filters, search.trim(), nextSkip, true)
   }
 
   return (
@@ -115,7 +93,8 @@ function DonationList({ onView }) {
 
       {loading && <p className="ua-muted">Loading…</p>}
       {error   && <div className="ua-msg ua-msg-error">{error}</div>}
-      {!loading && !error && donations.length === 0 && <p className="ua-muted">No donation records found</p>}
+      {!loading && !error && !searched && <p className="ua-muted">Enter a search term to view your donation history.</p>}
+      {!loading && !error && searched && donations.length === 0 && <p className="ua-muted">No donation records found.</p>}
 
       <div className="ua-list">
         {donations.map(donation => {

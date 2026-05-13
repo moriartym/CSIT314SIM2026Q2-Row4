@@ -83,27 +83,6 @@ class FundraisingActivityRepository {
     return result
   }
 
-  async findAllByUser(userId, limit = 5, skip = 0, category = '', status = '') {
-    const match = { createdBy: new mongoose.Types.ObjectId(userId) }
-    if (category && mongoose.Types.ObjectId.isValid(category)) {
-      match.category = new mongoose.Types.ObjectId(category)
-    }
-    if (status) {
-      const statuses = status.split(',').map(s => s.trim()).filter(Boolean)
-      match.status = statuses.length === 1 ? statuses[0] : { $in: statuses }
-    }
-    const [fras, total] = await Promise.all([
-      FundraisingActivity.find(match)
-        .select('title status targetAmount category viewCount shortlistCount')
-        .populate('category', 'name')
-        .skip(Number(skip))
-        .limit(Number(limit)),
-      FundraisingActivity.countDocuments(match)
-    ])
-    const data = await this._attachProgress(fras)
-    return { data, total }
-  }
-
   async findCompletedByUser(userId, filters = {}) {
     const match = { createdBy: userId, status: 'completed' }
     if (filters.category && mongoose.Types.ObjectId.isValid(filters.category)) {
@@ -132,24 +111,6 @@ class FundraisingActivityRepository {
     const [fras, total] = await Promise.all([
       FundraisingActivity.find(match)
         .select('title status targetAmount category viewCount shortlistCount')
-        .populate('category', 'name')
-        .skip(Number(skip))
-        .limit(Number(limit)),
-      FundraisingActivity.countDocuments(match)
-    ])
-    const data = await this._attachProgress(fras)
-    return { data, total }
-  }
-
-  async listAll(status = 'active', limit = 5, skip = 0, category = '') {
-    const match = { status }
-    if (category && mongoose.Types.ObjectId.isValid(category)) {
-      match.category = new mongoose.Types.ObjectId(category)
-    }
-    const [fras, total] = await Promise.all([
-      FundraisingActivity.find(match)
-        .select('title status targetAmount category viewCount shortlistCount completedAt')
-        .populate('createdBy', 'username')
         .populate('category', 'name')
         .skip(Number(skip))
         .limit(Number(limit)),

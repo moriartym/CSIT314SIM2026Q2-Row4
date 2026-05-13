@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react'
+import { useState } from 'react'
 import Donee_Favourites_View from './pages/Donee_Favourites_View'
 
 const FAV_API  = 'http://localhost:3001/api/favourites'
@@ -18,24 +18,7 @@ function FavouriteList({ onView }) {
   const [favLoading, setFavLoading]   = useState(new Set())
   const [skip, setSkip]               = useState(0)
   const [total, setTotal]             = useState(0)
-
-  const fetchList = async (currentSkip = 0, append = false) => {
-    append ? setLoadingMore(true) : setLoading(true)
-    setError(null)
-    try {
-      const params = new URLSearchParams({ limit: PAGE_SIZE, skip: currentSkip })
-      const res  = await fetch(`${FAV_API}?${params.toString()}`, { credentials: 'include' })
-      const data = await res.json()
-      if (data.success) {
-        setFavourites(prev => append ? [...prev, ...data.data] : data.data)
-        setTotal(data.total)
-        setSkip(currentSkip)
-      } else {
-        setError(data.message)
-      }
-    } catch { setError('Error connecting to server') }
-    finally { append ? setLoadingMore(false) : setLoading(false) }
-  }
+  const [searched, setSearched]       = useState(false)
 
   const fetchSearch = async (query, currentSkip = 0, append = false) => {
     append ? setLoadingMore(true) : setLoading(true)
@@ -48,6 +31,7 @@ function FavouriteList({ onView }) {
         setFavourites(prev => append ? [...prev, ...data.data] : data.data)
         setTotal(data.total)
         setSkip(currentSkip)
+        setSearched(true)
       } else {
         setError(data.message)
       }
@@ -55,18 +39,15 @@ function FavouriteList({ onView }) {
     finally { append ? setLoadingMore(false) : setLoading(false) }
   }
 
-  useEffect(() => { fetchList() }, [])
-
   const handleSearch = () => {
+    if (!search.trim()) return
     setSkip(0)
-    if (search.trim()) fetchSearch(search.trim())
-    else fetchList()
+    fetchSearch(search.trim())
   }
 
   const handleLoadMore = () => {
     const nextSkip = skip + PAGE_SIZE
-    if (search.trim()) fetchSearch(search.trim(), nextSkip, true)
-    else fetchList(nextSkip, true)
+    fetchSearch(search.trim(), nextSkip, true)
   }
 
   const handleUnfavourite = async (e, fraId, favId) => {
@@ -79,7 +60,7 @@ function FavouriteList({ onView }) {
       if (data.success) {
         setSkip(0)
         if (search.trim()) fetchSearch(search.trim(), 0)
-        else fetchList(0)
+        else { setFavourites([]); setTotal(0); setSearched(false) }
       }
     } catch {}
     finally { setFavLoading(prev => { const next = new Set(prev); next.delete(favId); return next }) }
@@ -89,7 +70,6 @@ function FavouriteList({ onView }) {
     <div className="ua-card">
       <div className="ua-card-header">
         <span className="ua-card-title">Saved campaigns</span>
-        <button className="ua-btn ua-btn-sm" onClick={() => { setSearch(''); setSkip(0); fetchList() }}>Refresh</button>
       </div>
 
       <div className="ua-field" style={{ display: 'flex', gap: '8px' }}>
@@ -106,7 +86,8 @@ function FavouriteList({ onView }) {
 
       {loading && <p className="ua-muted">Loading…</p>}
       {error   && <div className="ua-msg ua-msg-error">{error}</div>}
-      {!loading && !error && favourites.length === 0 && <p className="ua-muted">No favourites saved yet</p>}
+      {!loading && !error && !searched && <p className="ua-muted">Enter a search term to view your saved campaigns.</p>}
+      {!loading && !error && searched && favourites.length === 0 && <p className="ua-muted">No favourites found.</p>}
 
       <div className="ua-list">
         {favourites.map(fav => {

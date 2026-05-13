@@ -21,6 +21,7 @@ function CampaignList({ onView }) {
   const [category, setCategory]     = useState('')
   const [skip, setSkip]             = useState(0)
   const [total, setTotal]           = useState(0)
+  const [searched, setSearched]     = useState(false)
 
   useEffect(() => {
     fetch(`${CAT_API}/all`, { credentials: 'include' })
@@ -28,25 +29,6 @@ function CampaignList({ onView }) {
       .then(d => { if (d.success) setCategories((d.data || []).filter(c => c.isActive)) })
       .catch(() => {})
   }, [])
-
-  const fetchList = async (status, cat, currentSkip = 0, append = false) => {
-    append ? setLoadingMore(true) : setLoading(true)
-    setError(null)
-    try {
-      const params = new URLSearchParams({ status, limit: PAGE_SIZE, skip: currentSkip })
-      if (cat) params.set('category', cat)
-      const res  = await fetch(`${API}/all?${params.toString()}`, { credentials: 'include' })
-      const data = await res.json()
-      if (data.success) {
-        setFras(prev => append ? [...prev, ...data.data] : data.data)
-        setTotal(data.total)
-        setSkip(currentSkip)
-      } else {
-        setError(data.message)
-      }
-    } catch { setError('Error connecting to server') }
-    finally { append ? setLoadingMore(false) : setLoading(false) }
-  }
 
   const fetchSearch = async (status, query, cat, currentSkip = 0, append = false) => {
     append ? setLoadingMore(true) : setLoading(true)
@@ -60,6 +42,7 @@ function CampaignList({ onView }) {
         setFras(prev => append ? [...prev, ...data.data] : data.data)
         setTotal(data.total)
         setSkip(currentSkip)
+        setSearched(true)
       } else {
         setError(data.message)
       }
@@ -67,18 +50,24 @@ function CampaignList({ onView }) {
     finally { append ? setLoadingMore(false) : setLoading(false) }
   }
 
-  useEffect(() => { setSearch(''); setCategory(''); setSkip(0); fetchList(tab, '') }, [tab])
+  useEffect(() => {
+    setSearch('')
+    setCategory('')
+    setSkip(0)
+    setFras([])
+    setTotal(0)
+    setSearched(false)
+  }, [tab])
 
   const handleSearch = () => {
+    if (!search.trim()) return
     setSkip(0)
-    if (search.trim()) fetchSearch(tab, search.trim(), category)
-    else fetchList(tab, category)
+    fetchSearch(tab, search.trim(), category)
   }
 
   const handleLoadMore = () => {
     const nextSkip = skip + PAGE_SIZE
-    if (search.trim()) fetchSearch(tab, search.trim(), category, nextSkip, true)
-    else fetchList(tab, category, nextSkip, true)
+    fetchSearch(tab, search.trim(), category, nextSkip, true)
   }
 
   return (
@@ -93,7 +82,6 @@ function CampaignList({ onView }) {
 
       <div className="ua-card-header">
         <span className="ua-card-title">{tab === 'active' ? 'Active campaigns' : 'Completed campaigns'}</span>
-        <button className="ua-btn ua-btn-sm" onClick={() => { setSearch(''); setCategory(''); setSkip(0); fetchList(tab, '') }}>Refresh</button>
       </div>
 
       <div style={{ display: 'flex', gap: '8px', marginBottom: '0.5rem', flexWrap: 'wrap' }}>
@@ -122,7 +110,8 @@ function CampaignList({ onView }) {
 
       {loading && <p className="ua-muted">Loading…</p>}
       {error   && <div className="ua-msg ua-msg-error">{error}</div>}
-      {!loading && !error && fras.length === 0 && <p className="ua-muted">No campaigns found</p>}
+      {!loading && !error && !searched && <p className="ua-muted">Enter a search term to find campaigns.</p>}
+      {!loading && !error && searched && fras.length === 0 && <p className="ua-muted">No campaigns found.</p>}
 
       <div className="ua-list">
         {fras.map(fra => (
