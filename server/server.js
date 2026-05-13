@@ -7,11 +7,7 @@ dotenv.config()
 
 const PORT = process.env.PORT || 3001
 
-dns.setServers(['8.8.8.8', '8.8.4.4']);
-
-mongoose.connect(process.env.MONGO_URI, {
-  family: 4
-})
+mongoose.connect(process.env.MONGO_URI)
   .then(() => {
     console.log('MongoDB connected')
 
