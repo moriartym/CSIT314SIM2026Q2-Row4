@@ -19,6 +19,26 @@ const randAmt = (min, max) => Math.max(min, Math.round((Math.random() * (max - m
 const randDate = (start, end) =>
   new Date(start.getTime() + Math.random() * (end.getTime() - start.getTime()))
 
+const randCreatedAt = () => {
+  const now  = new Date()
+  const roll = Math.random()
+  if (roll < 0.10) {
+    const start = new Date(now.getFullYear(), now.getMonth(), now.getDate())
+    return randDate(start, now)
+  } else if (roll < 0.30) {
+    const end   = new Date(now.getFullYear(), now.getMonth(), now.getDate())
+    const start = new Date(end); start.setDate(start.getDate() - 6)
+    return randDate(start, end)
+  } else if (roll < 0.55) {
+    const end   = new Date(now.getFullYear(), now.getMonth(), now.getDate() - 6)
+    const start = new Date(now.getFullYear(), now.getMonth(), now.getDate() - 29)
+    return randDate(start, end)
+  } else {
+    const end   = new Date(now.getFullYear(), now.getMonth(), now.getDate() - 29)
+    return randDate(new Date('2023-01-01'), end)
+  }
+}
+
 const FIRST_NAMES = [
   'James','John','Robert','Michael','William','David','Richard','Joseph','Thomas','Charles',
   'Mary','Patricia','Jennifer','Linda','Barbara','Elizabeth','Susan','Jessica','Sarah','Karen',
@@ -141,6 +161,7 @@ async function seed() {
       const isCompleted = Math.random() < 0.25
       const isSuspended = !isCompleted && Math.random() < 0.10
       const status      = isCompleted ? 'completed' : isSuspended ? 'suspended' : 'active'
+      const createdAt = randCreatedAt()
       fraDocs.push({
         title:          `${pick(FRA_PREFIXES)} ${pick(FRA_SUBJECTS)} ${pick(FRA_SUFFIXES)}`,
         description:    pick(FRA_DESCRIPTIONS),
@@ -150,11 +171,12 @@ async function seed() {
         createdBy:      fr._id,
         viewCount:      rand(0, 500),
         shortlistCount: rand(0, 100),
-        completedAt:    isCompleted ? randDate(new Date('2023-01-01'), new Date()) : undefined,
+        createdAt,
+        completedAt:    isCompleted ? randDate(createdAt, new Date()) : undefined,
       })
     }
   }
-  const fras       = await FundraisingActivity.insertMany(fraDocs)
+  const fras       = await FundraisingActivity.insertMany(fraDocs, { timestamps: false })
   const activeFras = fras.filter(f => f.status === 'active')
 
   const donationDocs = []

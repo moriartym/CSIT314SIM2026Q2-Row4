@@ -67,7 +67,7 @@ export default function CreateUserAccount({ onNavigate }) {
       const res  = await fetch(API, { method: 'POST', headers: { 'Content-Type': 'application/json' }, credentials: 'include', body: JSON.stringify(body) })
       const data = await res.json()
       if (data.success) {
-        setMessage({ type: 'success', text: `User created! ID: ${data.data._id}` })
+        setMessage({ type: 'success', text: `User created! Username: ${data.data.username}` })
         setForm({ username: '', email: '', password: '', userProfile: '', dateOfBirth: '', phone: '', address: '' })
         setErrors({})
       } else {

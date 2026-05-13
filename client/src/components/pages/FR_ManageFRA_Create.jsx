@@ -47,7 +47,7 @@ export default function CreateFRA({ onNavigate }) {
       const res  = await fetch(API, { method: 'POST', headers: { 'Content-Type': 'application/json' }, credentials: 'include', body: JSON.stringify(body) })
       const data = await res.json()
       if (data.success) {
-        setMessage({ type: 'success', text: `Campaign created! ID: ${data.data._id}` })
+        setMessage({ type: 'success', text: `Campaign created! Title: ${data.data.title}` })
         setForm({ title: '', description: '', targetAmount: '', category: '' })
         setErrors({})
       } else {

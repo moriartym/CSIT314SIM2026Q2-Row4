@@ -11,7 +11,7 @@ class FavouriteRepository {
   }
 
   async findByDonee(doneeId, limit = 5, skip = 0) {
-    const all      = await Favourite.find({ donee: doneeId }).populate('fra', 'title status targetAmount category shortlistCount')
+    const all      = await Favourite.find({ donee: doneeId }).populate({ path: 'fra', select: 'title status targetAmount category shortlistCount', populate: { path: 'category', select: 'name' } })
     const filtered = all.filter(f => f.fra?.status === 'active')
     const total    = filtered.length
     const data     = filtered.slice(Number(skip), Number(skip) + Number(limit))
@@ -27,7 +27,7 @@ class FavouriteRepository {
   }
 
   async searchByDonee(doneeId, query, limit = 5, skip = 0) {
-    const all      = await Favourite.find({ donee: doneeId }).populate('fra', 'title status targetAmount category shortlistCount')
+    const all      = await Favourite.find({ donee: doneeId }).populate({ path: 'fra', select: 'title status targetAmount category shortlistCount', populate: { path: 'category', select: 'name' } })
     const filtered = all.filter(f => f.fra?.status === 'active' && f.fra?.title?.match(new RegExp(query, 'i')))
     const total    = filtered.length
     const data     = filtered.slice(Number(skip), Number(skip) + Number(limit))

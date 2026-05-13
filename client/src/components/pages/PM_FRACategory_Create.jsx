@@ -31,7 +31,7 @@ export default function CreateFRACategory({ onNavigate }) {
       const res  = await fetch(API, { method: 'POST', headers: { 'Content-Type': 'application/json' }, credentials: 'include', body: JSON.stringify(form) })
       const data = await res.json()
       if (data.success) {
-        setMessage({ type: 'success', text: `Category created! ID: ${data.data._id}` })
+        setMessage({ type: 'success', text: `Category created! Name: ${data.data.name}` })
         setForm({ name: '', description: '' })
         setErrors({})
       } else {

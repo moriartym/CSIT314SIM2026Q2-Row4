@@ -27,7 +27,8 @@ class FundraisingActivityRepository {
 
   async create(data) {
     const fra = new FundraisingActivity(data)
-    return await fra.save()
+    await fra.save()
+    return await fra.populate('category', 'name')
   }
 
   async update(id, data) {
